@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+{% load static %}
+  <head>
+    <title>{{question.name}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="{% static "lib/bootstrap/css/bootstrap.min.css" %}" rel="stylesheet" media="screen">
+    <link href="{% static "lib/bootstrap/css/bootstrap-theme.css" %}" rel="stylesheet" media="screen">
+    <link href="{% static "style/puzzle_display.css" %}" rel="stylesheet" media="screen">
+  </head>
+  <body>
+    <nav id="topbar" class="navbar navbar-default">
+
+</nav>
+    <div id="app_container">
+
+
+      <div id="app_top">
+              <h4>{{question.name}}</h4>
+              <nav class="navbar navbar-light  option">
+                  <div class="container-fluid">
+                  <ul class="nav navbar-nav">
+                    <li><a href="./">Description</a></li>
+                    <li><a href="./solution">Solution</a></li>
+                    <li><a href="./submission">Submission</a></li>
+                    <li><a href="./discuss">Discuss</a></li>
+                  </ul>
+                  </div>
+              </nav>
+      </div>
+<div id="app_left" class="app_grid">
+  app_left
+</div>
+<div class="column-gutter-1">
+</div>
+<div id="app_right_top" class="app_grid">
+  app_right_top
+</div>
+<div class="row-gutter-1">
+</div>
+<div id="app_right_bottom" class="app_grid">
+app_right_bottom
+</div>
+
+    </div>
+
+    <nav id="bottombar" class="navbar navbar-default">
+
+    </nav>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="{% static "lib/bootstrap/js/bootstrap.min.js" %}"></script>
+    <script src="https://ajaxorg.github.io/ace-builds/src/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script type="module" >
+    import Split from "{% static "lib/split_grid/split-grid.min.js" %}";
+    Split({
+      columnGutters: [{
+        track: 1,
+        element: document.querySelector('.column-gutter-1'),
+      }],
+      rowGutters: [{
+        track: 2,
+        element: document.querySelector('.row-gutter-1'),
+      }]
+    })
+  </script>
+
+{% if section == "description" %}
+<script src="{% static "src/puzzle_edit.js" %}"></script>
+{% elif section == "solution" %}
+
+document.getElementById('description').innerHTML=marked("{{question.solution}}");
+code_editor.setValue("{{question.solution_code}}",-1);
+
+{% endif %}
+
+
+
+
+
+
+
+
+  </body>
+</html>

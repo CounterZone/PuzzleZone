@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+{% load static %}
+  <head>
+    <title>{{question.name}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{% static "lib/bootstrap/css/bootstrap.min.css" %}" rel="stylesheet" media="screen">
+    <link href="{% static "lib/bootstrap/css/bootstrap-theme.css" %}" rel="stylesheet" media="screen">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="{% static "lib/bootstrap-markdown-editor/bootstrap-markdown-editor.css"  %}" rel="stylesheet">
+    <link href="{% static "style/puzzle.css" %}" rel="stylesheet" media="screen">
+
+  </head>
+  <body>
+    <nav id="topbar" class="navbar navbar-default">
+</nav>
+    <div id="app">
+      <h4>
+        {% if question.name == "new"  %}
+        <input type="text" style="font-size:large;" id="title">
+        {% else %}
+        {{question.name}}
+        {% endif %}
+        </h4>
+<div id="left">
+  <nav class="navbar bg-light option">
+  <div class="container-fluid">
+  <ul class="nav navbar-nav">
+    <li><a href="./edit">Description</a></li>
+    <li><a href="./edit_solution">Solution</a></li>
+    <li><a href="./edit_test">Test</a></li>
+  </ul>
+  </div>
+  </nav>
+<div id="description">
+  <textarea name="text" id="descrip_editor"></textarea>
+
+</div>
+</div>
+<div id="right">
+  <nav class="navbar bg-light option">
+  <div class="container-fluid">
+  </div>
+  </nav>
+  <div id="editor">
+
+  </div>
+</div>
+    </div>
+    <nav id="bottombar" class="navbar navbar-default">
+      <button id="save" class="btn btn-outline-success my-2 my-sm-0" onclick="submit(true);">Save</button>
+      <button id="submit" class="btn btn-outline-success my-2 my-sm-0" onclick="submit(false);">Submit</button>
+    </nav>
+   <div hidden>
+     <form method="post" id="q_form">
+       {{question_form}}
+       {% csrf_token %}
+     </form>
+  </div>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://code.jquery.com/jquery.js"></script>
+    <script src="{% static "lib/bootstrap/js/bootstrap.min.js" %}"></script>
+    <script src="https://ajaxorg.github.io/ace-builds/src/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="{% static "lib/bootstrap-markdown-editor/bootstrap-markdown-editor.js" %}"></script>
+    <script>
+    function save_question(section){
+      if(typeof(Storage)==undefined)
+        return;
+
+      if (section=="edit"){
+        window.sessionStorage.setItem("{{question.id}}.description",$('#descrip_editor').markdownEditor('getContent'));
+        window.sessionStorage.setItem("{{question.id}}.pre_solution",code_editor.getValue());
+      }
+      else if (section=="edit_solution"){
+        window.sessionStorage.setItem("{{question.id}}.solution",$('#descrip_editor').markdownEditor('getContent'));
+        window.sessionStorage.setItem("{{question.id}}.solution_code",code_editor.getValue());
+      }
+      else if (section=="edit_test"){
+        window.sessionStorage.setItem("{{question.id}}.test_cases",$('#descrip_editor').markdownEditor('getContent'));
+        window.sessionStorage.setItem("{{question.id}}.test_code",code_editor.getValue());
+      }
+      {% if question.name == "new"  %}
+      window.sessionStorage.setItem("{{question.id}}.name",$("#title").val());
+      {% endif %}
+    }
+
+    function load_question(section){
+      if(typeof(Storage)==undefined)
+        return;
+        var des,sol;
+      if (section=="edit"){
+        des=window.sessionStorage.getItem("{{question.id}}.description");
+        sol=window.sessionStorage.getItem("{{question.id}}.pre_solution");
+      }
+      else if (section=="edit_solution"){
+        des=window.sessionStorage.getItem("{{question.id}}.solution");
+        sol=window.sessionStorage.getItem("{{question.id}}.solution_code");
+      }
+      else if (section=="edit_test"){
+        des=window.sessionStorage.getItem("{{question.id}}.test_cases");
+        sol=window.sessionStorage.getItem("{{question.id}}.test_code");
+      }
+      if (des)$('#descrip_editor').markdownEditor('setContent', des);
+      if (sol)code_editor.setValue(sol,-1);
+      {% if question.name == "new"  %}
+      $("#title").val(window.sessionStorage.getItem("{{question.id}}.name"));
+      {% endif %}
+    }
+
+    function submit(draft){
+      save_question("{{section}}");
+      for (const k of ["description","pre_solution","solution","solution_code","test_cases","test_code","name"])
+      $("#f_"+k).val(window.sessionStorage.getItem("{{question.id}}."+k));
+      document.getElementById("f_isdraft").checked = draft;
+      document.getElementById("q_form").submit();
+    }
+  </script>
+    <script>
+    {% if section == "edit" or  section == "edit_solution" %}
+      $('#descrip_editor').markdownEditor({fullscreen:false,preview: true,
+        onPreview: function (content, callback) {
+          callback(marked(content));
+        },
+      });
+      {% endif %}
+
+      var code_editor=ace.edit("editor");
+      code_editor.setOptions({
+        autoScrollEditorIntoView: true,
+        copyWithEmptySelection: true,
+      });
+      code_editor.session.setMode("ace/mode/python");
+{% for k,v in question.items %}
+if(!window.sessionStorage.getItem("{{question.id}}.{{k}}"))
+  window.sessionStorage.setItem("{{question.id}}.{{k}}","{{v}}");
+
+{% endfor %}
+
+
+      load_question("{{section}}");
+      window.addEventListener('beforeunload',(event)=>{
+        save_question("{{section}}");
+      });
+
+
+      </script>
+
+
+
+  </body>
+</html>
