@@ -6,27 +6,32 @@ from . import forms
 def puzzle_display_page(request,id,section=None):
     try:
         if id=="new":
-            q=Question.objects.get(name=id)
+            q=Question.objects.get(name='new')
         else:
             q=Question.objects.get(id=id)
+            if q.name=='new':
+                throw();
     except:
         return HttpResponse('<h1>Page was not found</h1>')
     view_permission=(request.user.is_superuser) or (q.name!="new" and((q.audited==Question.ACCEPTED) \
                     or (request.user.is_authenticated and request.user.username==q.creator.username)))
     edit_permission= (request.user.is_superuser) or (request.user.is_authenticated and \
-                    (q.name=="new" or request.user.username==q.creator.username))
+                    (q.name=="new" or (request.user.username==q.creator.username and q.audited==Question.DRAFT)))
     if request.method=="POST":
         if section in ["edit","edit_solution","edit_test"] and edit_permission:
-            instance=q if id!="new" else None
+            instance=q if q.name!='new' else None
             posted_question=forms.PostQuestion(request.POST,instance=instance)
-
             if posted_question.is_valid():
                 p=posted_question.save(False)
+                if p.name=="new":
+                    return HttpResponse('<h1>Invalid title</h1>')
                 if posted_question.cleaned_data["isdraft"]:
                     p.audited=Question.DRAFT
                 else:
                     p.audited=Question.SUBMITTED
                 p.save()
+            else:
+                return HttpResponse('<h1>Invalid submission</h1>')
             return redirect("/puzzles/"+str(posted_question.instance.id))
     elif request.method=="GET":
         if not section:
@@ -35,13 +40,13 @@ def puzzle_display_page(request,id,section=None):
             if view_permission:
                 context=vars(q)
                 context["section"]=section
-                return HttpResponse(render(request,'puzzle/puzzle_display_page.html',context={"section":section,"question":context}))
+                return HttpResponse(render(request,'puzzle/display/'+section+'.html',context={"section":section,"question":context}))
             else:
                 pass # redirect
         elif section in ["edit","edit_solution","edit_test"]:
             if edit_permission:
                 context=vars(q)
-                return HttpResponse(render(request,'puzzle/puzzle_edit_page.html',context={"section":section,"question":context,"question_form":forms.PostQuestion(auto_id='f_%s')}))
+                return HttpResponse(render(request,'puzzle/display/'+section+'.html',context={"section":section,"question":context,"question_form":forms.PostQuestion(auto_id='f_%s')}))
             else:
                 pass # redirect
         else:

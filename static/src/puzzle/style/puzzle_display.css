@@ -30,6 +30,7 @@ height:20 px;
 #app_left{
 grid-column:1;
 grid-row:2/5;
+padding:10px;
 }
 #app_right_top{
 grid-column:3;
@@ -55,11 +56,12 @@ grid-row:4;
   min-height:40px !important;
   width:100% !important;
   padding-left:20px !important;
+  border: 0.2px red solid;
 }
 #bottombar{
   position: absolute !important;
   bottom: 0 !important;
-  margin-bottom: 0;
+
 }
 .section{
   margin-left:-20px !important;
@@ -68,13 +70,10 @@ grid-row:4;
 
   min-height: 20px;
 }
-#description,#editor{
-border: 0.2px gray solid;
-min-height:400px;
-word-wrap: break-word;
-}
-#descrip_editor{
-  resize: none;
+
+#description_editor,#preview{
+  resize: none;border: none;    outline: none;
+
   height:100%;
   width:100%;
 }

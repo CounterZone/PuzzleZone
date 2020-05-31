@@ -1,0 +1,74 @@
+{% extends "puzzle/display/puzzle_display_page.html" %}
+{% load static %}
+
+{% block app_left %}
+<textarea id='description_editor'>
+  {{question.description}}
+</textarea>
+<div id="preview">
+</div>
+{% endblock %}
+
+{% block app_righttop %}
+{{question.pre_solution}}
+{% endblock %}
+
+{% block title %}
+
+{% if question.name == "new" %}
+<input style="font-size: 1em;padding-left:5px"  maxlength="256" id="q_name" value="* enter your title here *">
+{% else %}
+<h4 style="padding-left:5px" id="q_name">{{question.name}}</h4>
+{% endif %}
+
+{% endblock title %}
+
+{% block app_top %}
+  <nav class="navbar navbar-expand-sm navbar-light bg-transparent section">
+  <div class="collapse navbar-collapse">
+    <ul class="navbar-nav mr-auto">
+      <li id="sec_edit" class="nav-item ">
+        <a class="nav-link" href="./edit">Description </a>
+      </li>
+      <li id="sec_edit_solution"  class="nav-item">
+        <a class="nav-link" href="./edit_solution">Solution</a>
+      </li>
+      <li id="sec_edit_test" class="nav-item">
+        <a class="nav-link" href="./edit_test">Testcases</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+{% endblock app_top %}
+
+
+{% block bottombar %}
+    <nav id="bottombar" class="navbar navbar-expand-sm navbar-light bg-transparent">
+        <div class="collapse navbar-collapse">
+          <ul class="navbar-nav mr-auto navbar-right">
+            <li  class="nav-item ">
+              <button id="toggle_preview" class="btn btn-outline-info my-2 my-sm-0" data-toggle="button">Preview</button>
+            </li>
+          </ul>
+          <ul class="navbar-nav ml-auto navbar-right">
+            <li  class="nav-item ">
+              <button id="test_question" class="btn btn-outline-success my-2 my-sm-0" >Test</button>
+              <button id="save_draft" class="btn btn-outline-dark my-2 my-sm-0" >Save draft</button>
+
+              <button id="submit_question" class="btn btn-outline-primary my-2 my-sm-0" >Submit</button>
+            </li>
+          </ul>
+
+        </div>
+    </nav>
+{% endblock %}
+
+{% block src %}
+<div hidden>
+  <form method="post" id="q_form">
+    {{question_form}}
+    {% csrf_token %}
+  </form>
+</div>
+<script  src="{% static "src/puzzle/dist/puzzle_edit.min.js" %}"></script>
+{% endblock src %}

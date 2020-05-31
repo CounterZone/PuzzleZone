@@ -1,0 +1,27 @@
+{% extends "puzzle/display/edit.html" %}
+
+{% block app_left %}
+<textarea id='description_editor'>
+  {{question.test_cases}}
+</textarea>
+
+{% endblock %}
+
+{% block app_righttop %}
+{{question.test_code}}
+{% endblock %}
+
+
+{% block bottombar %}
+    <nav id="bottombar" class="navbar navbar-expand-sm navbar-light bg-transparent">
+        <div class="collapse navbar-collapse">
+          <ul class="navbar-nav ml-auto navbar-right">
+            <li  class="nav-item ">
+              <button id="test_question" class="btn btn-outline-success my-2 my-sm-0" >Test</button>
+              <button id="save_draft" class="btn btn-outline-dark my-2 my-sm-0" >Save draft</button>
+              <button id="submit_question" class="btn btn-outline-primary my-2 my-sm-0" >Submit</button>
+            </li>
+          </ul>
+        </div>
+    </nav>
+{% endblock %}

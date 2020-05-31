@@ -1,17 +1,14 @@
 const path = require('path');
 const webpack =require('webpack');
 module.exports = {
-  entry: './puzzle.js',
+  entry:{'puzzle': './puzzle.js','puzzle_edit':'./edit.js','puzzle_display':'./display.js'},
   output: {
-    filename: 'puzzle.min.js',
+    filename: '[name].min.js',
     path: path.resolve(__dirname, 'dist'),
   },
-  plugins: [
-   new webpack.ProvidePlugin({
-     $: "jquery",
-     jQuery: "jquery"
-   })
- ],
+  optimization: {
+        minimize: false
+    },
   module:{
     rules: [
           {

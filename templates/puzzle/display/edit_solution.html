@@ -1,0 +1,15 @@
+{% extends "puzzle/display/edit.html" %}
+
+{% block app_left %}
+<textarea id='description_editor'>
+  {{question.solution}}
+</textarea>
+<div id="preview">
+</div>
+{% endblock %}
+
+
+
+{% block app_righttop %}
+{{question.solution_code}}
+{% endblock %}

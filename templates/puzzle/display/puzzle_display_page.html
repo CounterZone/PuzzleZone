@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+{% load static %}
+  <head>
+    <title>{{question.name}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{% static "src/puzzle/style/puzzle_display.css" %}" rel="stylesheet" media="screen">
+  </head>
+  <body>
+    {% block topbar %}
+    <nav id="topbar" class="navbar navbar-expand-sm navbar-light bg-transparent">
+
+
+</nav>
+{% endblock %}
+
+{% block app_container %}
+    <div id="app_container">
+      <div id="app_top">
+        {% block title %}
+              <h4 style="padding-left:5px">{{question.name}}</h4>
+        {% endblock title %}
+{% block app_top %}
+              <nav class="navbar navbar-expand-sm navbar-light bg-transparent section">
+
+
+  <div class="collapse navbar-collapse">
+    <ul class="navbar-nav mr-auto">
+      <li id="sec_description" class="nav-item ">
+        <a class="nav-link" href="./">Description </a>
+      </li>
+      <li id="sec_solution"  class="nav-item">
+        <a class="nav-link" href="./solution">Solution</a>
+      </li>
+      <li id="sec_submission" class="nav-item">
+        <a class="nav-link" href="./submission">Submission</a>
+      </li>
+      <li id="sec_discussion" class="nav-item">
+        <a class="nav-link" href="./discussion">Discussion</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+{% endblock app_top %}
+      </div>
+
+
+<div id="app_left" class="app_grid">
+  {% block app_left %}
+
+{% endblock %}
+</div>
+<div id="column-gutter-1" class='gutter'>
+</div>
+<div id="app_right_top" class="app_grid">
+  {% block app_righttop %}
+
+{% endblock %}
+</div>
+<div id="row-gutter-1" class='gutter'>
+</div>
+<div id="app_right_bottom" class="app_grid">
+  {% block app_rightbot %}
+
+{% endblock %}
+</div>
+
+    </div>
+{% endblock app_container %}
+
+
+
+{% block bottombar %}
+    <nav id="bottombar" class="navbar navbar-expand-sm navbar-light bg-transparent">
+        <div class="collapse navbar-collapse">
+          <ul class="navbar-nav ml-auto navbar-right">
+            <li id="sec_description" class="nav-item ">
+              <button id="test" class="btn btn-outline-success my-2 my-sm-0" >Test</button>
+            </li>
+          </ul>
+        </div>
+    </nav>
+{% endblock %}
+
+<input type="hidden" id="q_attr" q_id="{{question.id}}" q_name="{{question.name}}" sec="{{section}}">
+
+ {% block src %}
+<script  src="{% static "src/puzzle/dist/puzzle_display.min.js" %}"></script>
+{% endblock src %}
+
+
+
+  </body>
+</html>
