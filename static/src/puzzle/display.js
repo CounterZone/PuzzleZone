@@ -1,4 +1,4 @@
-import {load_split,load_code_editor,render_md} from './puzzle.js'
+import {load_split,load_code_editor,render_md,test_socket,display_log} from './puzzle.js'
 import jQuery from "../../lib/node_modules/jquery";
 window.$ = window.jQuery = jQuery;
 // this file is for solution and description sections
@@ -26,6 +26,36 @@ load();
 
 
 window.addEventListener('beforeunload',save);
+
 $(document).ready(function() {
     $('#sec_'+section).addClass('active');
+});
+
+
+
+
+$("#test_solution").on('click',()=>{
+  $('#app_right_bottom').html('');
+
+display_log('Connecting...');
+
+  var ws=test_socket(id);
+
+  ws.onMessage.addListener(data => {
+  display_log(data)
+  });
+
+  save();
+  ws.onMessage.addListener(() => {
+  display_log('Connection closed.')
+  });
+
+ws.open().then(
+()=>{display_log('Connected.');
+  ws.send(JSON.stringify({
+                'solution': code_editor.getValue()
+            })
+  )});
+
+
 });

@@ -4,6 +4,8 @@ import "../../lib/node_modules/bootstrap";
 import '../../lib/node_modules/bootstrap/dist/css/bootstrap.min.css';
 import {ResizeSensor} from "../../lib/node_modules/css-element-queries";
 import "../../lib/node_modules/ace-builds/src-noconflict/mode-python";
+import WebSocketAsPromised from '../../lib/node_modules/websocket-as-promised';
+
 var MDit = require("../../lib/node_modules/markdown-it")();
 
 export function load_split(){
@@ -31,19 +33,21 @@ return MDit.render(text);
 }
 
 
-export function test(){
-  const testSocket = new WebSocket(
+
+export function display_log(msg){
+  $('#app_right_bottom').append('<p> > '+msg+'</p>');
+  $('#app_right_bottom').scrollTop($('#app_right_bottom')[0].scrollHeight);
+
+}
+
+export function test_socket(id){
+  const testSocket = new WebSocketAsPromised(
     'ws://'
     + window.location.host
-    + '/test_solution/'
+    + '/puzzle/'+id
 );
 
-testSocket.onmessage = function(e) {
-console.log(e);
-};
 
-testSocket.onclose = function(e) {
-    console.error('Chat socket closed unexpectedly');
-};
+
 return testSocket;
 }

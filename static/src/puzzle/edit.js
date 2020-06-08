@@ -1,4 +1,4 @@
-import {load_split,load_code_editor,render_md} from './puzzle.js'
+import {load_split,load_code_editor,render_md,test_socket,display_log} from './puzzle.js'
 import jQuery from "../../lib/node_modules/jquery";
 window.$ = window.jQuery = jQuery;
 // this file is for edit

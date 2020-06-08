@@ -36,13 +36,19 @@ padding:10px;
 grid-column:3;
 grid-row:2;
 }
-#app_right_bottom{
-grid-column:3;
-grid-row:4;
-}
+
 .app_grid{
   border: 0.2px gray solid;
   overflow: hidden;
+}
+#app_right_bottom{
+grid-column:3;
+grid-row:4;
+overflow: auto;
+
+}
+#app_right_bottom>p{
+  margin:0;
 }
 #column-gutter-1{
   grid-column:2;
