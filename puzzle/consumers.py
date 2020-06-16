@@ -1,11 +1,11 @@
 import json
-from channels.generic.websocket import AsyncWebsocketConsumer
-
-class PuzzleConsumer(AsyncWebsocketConsumer):
-    async def connect(self):
+from channels.generic.websocket import WebsocketConsumer
+from .docker_test import atest
+class PuzzleConsumer(WebsocketConsumer):
+    def connect(self):
         print(self.scope)
-        await self.accept()
-        
+        self.accept()
+
 
     def disconnect(self, close_code):
         print('disconnected.')
@@ -14,6 +14,9 @@ class PuzzleConsumer(AsyncWebsocketConsumer):
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
         solution_code = text_data_json['solution']
-        print(solution_code)
-        for i in range(6):
-            self.send(str(i))
+
+        for i in range(2):
+            a=atest()
+            print(type(a))
+            self.send(str(a))
+        self.close()
