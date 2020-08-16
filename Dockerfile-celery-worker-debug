@@ -1,0 +1,9 @@
+FROM python:3.8.3-buster
+COPY ./requirements_worker.txt /
+RUN pip install -r requirements_worker.txt
+RUN mkdir puzzle
+COPY ./puzzle/models.py /puzzle
+COPY ./puzzle/__init__.py /puzzle
+COPY ./puzzle/Docker_test  /puzzle/Docker_test
+WORKDIR /puzzle
+ENTRYPOINT celery -A Docker_test worker --concurrency=1 --loglevel=debug

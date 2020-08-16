@@ -1,0 +1,53 @@
+version: '3.8'
+volumes:
+  user_test:
+    name: puzzlezone_user_test
+    driver: local
+    labels:
+      - docker.puzzle.user_test:user_test
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile-web-debug
+    volumes:
+      - .:/app
+    command: ['python','manage.py','runserver','0.0.0.0:8000']
+    ports:
+        - "8000:8000"
+    depends_on:
+        - db
+        - rabbit
+  worker:
+    privileged: true
+    build:
+      context: .
+      dockerfile: Dockerfile-celery-worker-debug
+    deploy:
+      mode: replicated
+      replicas: 10
+      placement:
+        max_replicas_per_node: 1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # expose the docker socket
+      - user_test:/puzzle/Docker_test/user:rw
+    depends_on:
+      - rabbit
+      - db
+  rabbit:
+    hostname: rabbit
+    image: rabbitmq:latest
+    environment:
+        - RABBITMQ_DEFAULT_USER=rabbit
+        - RABBITMQ_DEFAULT_PASS=rabbit
+    ports:
+        - "5672:5672"

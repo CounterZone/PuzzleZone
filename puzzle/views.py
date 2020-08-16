@@ -1,6 +1,8 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponse,Http404
-from .models import Question
+from .models import Question,Submission
+from django.core.paginator import Paginator
+
 from . import forms
 # Create your views here.
 def puzzle_display_page(request,id,section=None):
@@ -10,7 +12,7 @@ def puzzle_display_page(request,id,section=None):
         else:
             q=Question.objects.get(id=id)
             if q.name=='new':
-                throw();
+                throw()
     except:
         return HttpResponse('<h1>Page was not found</h1>')
     view_permission=(request.user.is_superuser) or (q.name!="new" and((q.audited==Question.ACCEPTED) \
@@ -32,7 +34,7 @@ def puzzle_display_page(request,id,section=None):
                 p.save()
             else:
                 return HttpResponse('<h1>Invalid submission</h1>')
-            return redirect("/puzzles/"+str(posted_question.instance.id))
+            return redirect("/puzzles/"+str(posted_question.instance.id)+'/edit')
     elif request.method=="GET":
         if not section:
             section="description"
@@ -51,3 +53,27 @@ def puzzle_display_page(request,id,section=None):
                 pass # redirect
         else:
             return HttpResponse('<h1>Page was not found</h1>')
+
+def puzzle_list_page(request):
+    q_list = Question.objects.filter(audited=Question.ACCEPTED).exclude(name='new').values('name','creator','have_solution')
+    paginator = Paginator(q_list, 20) 
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request,'puzzle/puzzle_list.html',context={'page_obj':page_obj,'start_index':page_obj.start_index()})
+
+
+def puzzle_submission_page(request,id,submission_id=None):
+    q=Question.objects.get(id=id)
+    if q.name=='new':
+        return HttpResponse('<h1>Page was not found</h1>')
+    context=vars(q)
+    if submission_id==None:
+        sub_list=Submission.objects.filter(question__id=id,private=False)
+        user_sub_list=Submission.objects.filter(creator__id=request.user.id) if request.user else None
+        return HttpResponse(render(request,'puzzle/display/submission_list.html',context={"section":'submission',"question":context}))# add context
+    else:
+        sub=Submission.objects.get(id=submission_id)
+        view_permission=sub.question.id==q.id and  ((request.user.is_superuser) or \
+            (q.name!="new" and((q.private==False) or (request.user.id==sub.creator.id))))
+        if view_permission:
+            return HttpResponse(render(request,'puzzle/display/submission_view.html',context={"section":'submission',"question":context,"submission":vars(sub)}))# add context

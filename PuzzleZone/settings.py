@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'channels',
     'puzzle',
-
 ]
 
 MIDDLEWARE = [
@@ -73,6 +72,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'PuzzleZone.wsgi.application'
+ASGI_APPLICATION = 'PuzzleZone.routing.application'
 
 
 # Database
@@ -80,9 +80,13 @@ WSGI_APPLICATION = 'PuzzleZone.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'postgres',
+            'USER': 'postgres',
+            'PASSWORD': 'postgres',
+            'HOST': 'db',
+            'PORT': 5432,
+        }
 }
 
 
@@ -126,4 +130,3 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS=[
 STATIC_DIR,
 ]
-ASGI_APPLICATION = 'PuzzleZone.routing.application'

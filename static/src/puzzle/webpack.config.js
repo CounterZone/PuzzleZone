@@ -1,14 +1,22 @@
 const path = require('path');
-const webpack =require('webpack');
+
 module.exports = {
-  entry:{'puzzle': './puzzle.js','puzzle_edit':'./edit.js','puzzle_display':'./display.js'},
+  entry:{'puzzle': './puzzle/puzzle.js',
+  'puzzle_edit':'./puzzle/edit.js',
+  'puzzle_display':'./puzzle/display.js',
+  'puzzle_list':'./puzzle/puzzle_list.js',
+  'puzzle_submission':'./puzzle/submission.js'
+
+},
   output: {
     filename: '[name].min.js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, '../puzzle/dist'),
   },
+
   optimization: {
         minimize: false
     },
+
   module:{
     rules: [
           {
@@ -18,3 +26,4 @@ module.exports = {
         ]
   }
 };
+// todo: remove duplications

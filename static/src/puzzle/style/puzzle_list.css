@@ -1,0 +1,19 @@
+#app_container{
+  margin:10px;left:0;right:0;
+  position:absolute;
+
+  bottom: 40px ;
+  top:40px;
+  text-align: center;
+}
+#topbar,#bottombar{
+  min-height:40px !important;
+  width:100% !important;
+  padding-left:20px !important;
+  border: 0.2px red solid;
+}
+#p_list,#p_page{
+display: block !important;
+text-align: center;
+
+}

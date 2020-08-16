@@ -19,7 +19,9 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
 urlpatterns = [
+    path('',views.puzzle_list_page),
     path('<id>/',views.puzzle_display_page),
+    path('<id>/submission',views.puzzle_submission_page),
+    path('<id>/submission/<submission_id>',views.puzzle_submission_page),
     path('<id>/<section>',views.puzzle_display_page),
-
 ]

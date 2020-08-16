@@ -1,2 +1,2 @@
-cd ./static/src/puzzle
-npx webpack 
+cd ./static/src
+npx webpack --config ./puzzle/webpack.config.js

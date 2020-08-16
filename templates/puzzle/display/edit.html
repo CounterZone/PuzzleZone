@@ -34,7 +34,7 @@
         <a class="nav-link" href="./edit_solution">Solution</a>
       </li>
       <li id="sec_edit_test" class="nav-item">
-        <a class="nav-link" href="./edit_test">Testcases</a>
+        <a class="nav-link" href="./edit_test">Test</a>
       </li>
     </ul>
   </div>
@@ -64,6 +64,8 @@
 {% endblock %}
 
 {% block src %}
+<input type="hidden" id="q_attr" q_id="{{question.id}}" q_name="{{question.name}}" sec="{{section}}">
+
 <div hidden>
   <form method="post" id="q_form">
     {{question_form}}
@@ -71,4 +73,5 @@
   </form>
 </div>
 <script  src="{% static "src/puzzle/dist/puzzle_edit.min.js" %}"></script>
+
 {% endblock src %}

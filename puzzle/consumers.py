@@ -1,24 +1,117 @@
 import json
-from channels.generic.websocket import AsyncWebsocketConsumer
+from channels.generic.websocket import WebsocketConsumer
+from channels.db import database_sync_to_async
+from celery import Celery
+from .models import Submission,Question
+'''
+websocket api
+legal message received:
+{'command':'sample_test', 'solution':solution_code, 'question_id':q_id}
+{'command':'full_test', 'solution':solution_code, 'question_id':q_id}
+{'command':'question_test','question_id':q_id}
 
-class PuzzleConsumer(AsyncWebsocketConsumer):
+legal message to send:
+{'command':'display','message':msg}
+{'command':'pass_sample_test'}
+{'command':'fail_sample_test'}
+{'command':'submission_redirect','message':submission_id}
+
+'''
+
+
+
+
+celery_app = Celery('test_celery',broker='amqp://rabbit:rabbit@rabbit:5672',backend='rpc://',include=[])
+
+class PuzzleConsumer(WebsocketConsumer):
     '''
     deal with the websocket created by the user.
-    the solution code is sent through the websocket. the server would send messages about the test.
-    the 'submission' command also send through the socket. the server would accept the submission only when the test is passed.
+    the solution code is sent through the websocket. the server would send the test results, then close the connection
+    the 'submission' command also send through the socket.
+    one user can only have one connection.
     '''
-    async def connect(self):
-        print(self.scope)
-        self.accept()
-    async def disconnect(self, close_code):
-        print('disconnected.')
-        pass
-    async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        solution_code = text_data_json['solution']
+    def connect(self):
+        self.scope['session']['task_in_running']=False
 
-        for i in range(2):
-            a=atest()
-            print(type(a))
-            self.send(str(a))
-        self.close()
+        task_in_running=False if 'task_in_running' not in self.scope['session'] else self.scope['session']['task_in_running']
+        if task_in_running:
+            self.send_msg('display','You have task in running!')
+            self.close()
+            return
+        self.user = self.scope["user"]
+        self.scope['session']['task_in_running']=True
+        self.scope['session'].save()
+        self.accept()
+    def disconnect(self, close_code):
+        self.scope['session']['task_in_running']=False
+        self.scope['session'].save()
+    def send_msg(self,cmd,msg,target='client'):
+        '''
+        if target = 'client', send the msg to the client
+        else, if target = a list, add the msg to the list
+        '''
+        if target=='client':
+            self.send(json.dumps({'command':cmd,'message':msg}))
+        else:
+            target.append(msg)
+    def receive(self, text_data):
+        message=json.loads(text_data)
+        if message['command'] in ['sample_test','full_test','question_test']:
+            self.send_msg('display','pending...')
+            sol=message['solution']
+            q_id = message['question_id']
+            if message['command']=='sample_test':
+                a_res=celery_app.send_task(message['command'],[sol,q_id])
+                m=a_res.get(on_message=self.process_celery_message,propagate=False)
+                if m:
+                    self.send_msg('pass_sample_test',None)
+                else:
+                    self.send_msg('fail_sample_test',None)
+
+            elif message['command']=='full_test':
+                log=[]
+                a_res=celery_app.send_task(message['command'],[sol,q_id])
+                m=a_res.get(on_message=lambda x:self.process_celery_message(x,log),propagate=False)
+                status,pass_num,tot_num=m
+                score=pass_num/tot_num if status=='Succeed.' else 0
+                result=status+' {p:d}/{t:d} passed.'.format(p=pass_num,t=tot_num)
+                sub=Submission(
+                creator=self.user,
+                question=Question.objects.get(id=q_id),
+                code=sol,
+                log='\n'.join(log),
+                result=result,
+                score=score
+                )
+                sub.save()
+                if status=='Succeed.':
+                    self.send_msg('submission_redirect',str(sub.id))
+                elif status=='ExceedTimeLimit':
+                    self.send_msg('display','Exceeded time limit!')
+
+            elif message['command']=='question_test':
+                a_res=celery_app.send_task('question_test',[q_id])
+                m=a_res.get(on_message=self.process_celery_message,propagate=False)
+                status,pass_num,tot_num=m
+                result=status+' {p:d}/{t:d} passed.'.format(p=pass_num,t=tot_num)
+                if status=='Succeed.':
+                    self.send_msg('display',result)
+                elif status=='ExceedTimeLimit':
+                    self.send_msg('display','Exceeded time limit!')
+            self.close()
+    def process_celery_message(self,message,log=None):
+        '''
+        process the message received from the cellery tasks
+        message:
+        {
+        'status': 'TEST_PASS' or 'TEST_FAIL' or 'SUCCESS'
+        'result': {'message':msg}
+        }
+
+        '''
+        if message['status'] in ['TEST_PASS','TEST_FAIL']:
+            self.send_msg('display',message['result']['stdout'])
+            self.send_msg('display',message['result']['message'])
+            if log:
+                self.send_msg('display',message['result']['stdout'])
+                self.send_msg('display',message['result']['message'],log)
