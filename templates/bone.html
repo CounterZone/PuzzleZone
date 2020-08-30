@@ -1,0 +1,53 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="{% static "src/puzzle/style/bone.css" %}" rel="stylesheet" media="screen">
+  <link href="{% static "src/node_modules/@fortawesome/fontawesome-free/css/all.css" %}" rel="stylesheet" media="screen">
+
+{% block head %}
+{% endblock head %}
+</head>
+<body>
+
+{% block topbar %}
+<nav id="topbar" class="navbar navbar-expand-sm navbar-light bg-transparent">
+
+
+
+
+<ul class="navbar-nav ml-auto navbar-right">
+  {% if user.is_authenticated %}
+    <div onclick="location.href='/profile';" style="cursor:pointer">{{user.username}}</div>
+    {% else %}
+  <li class="nav-item ">
+    <button id="sign_in_button" onclick="location.href='/sign_in';" class="btn btn-outline-success my-2 my-sm-0">Sign In</button>
+  </li>
+  {% endif %}
+</ul>
+
+
+</nav>
+{% endblock %}
+<div id="app_container">
+
+{% block app_container %}
+
+{% endblock app_container %}
+
+</div>
+
+
+{% block bottombar %}
+
+{% endblock %}
+
+{% block vendor %}
+{% endblock %}
+{% block src %}
+
+{% endblock src %}
+
+</body>
+</html>

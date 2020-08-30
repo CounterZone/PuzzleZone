@@ -41,6 +41,7 @@ except docker.errors.NotFound:
     read_only=True,
     working_dir='/user',
     name=CONTAINER_NAME,
+    network_disabled=True
     )
 container.start()
 
@@ -70,7 +71,8 @@ def sample_test(self,solution,question_id):
                 return False
         return True
     except SoftTimeLimitExceeded:
-        pass
+        self.update_state(state='TEST_FAIL',meta={'stdout':'ExceedTimeLimit','message':""})
+        return False
 
 
 

@@ -2,6 +2,8 @@ from django.shortcuts import render,redirect
 from django.http import HttpResponse,Http404
 from .models import Question,Submission
 from django.core.paginator import Paginator
+from .forms import Signup
+
 
 from . import forms
 # Create your views here.
@@ -41,6 +43,7 @@ def puzzle_display_page(request,id,section=None):
         if section in ["description","solution"] and id!="new":
             if view_permission:
                 context=vars(q)
+                context['creator']=q.creator.username
                 context["section"]=section
                 return HttpResponse(render(request,'puzzle/display/'+section+'.html',context={"section":section,"question":context}))
             else:
@@ -55,11 +58,39 @@ def puzzle_display_page(request,id,section=None):
             return HttpResponse('<h1>Page was not found</h1>')
 
 def puzzle_list_page(request):
-    q_list = Question.objects.filter(audited=Question.ACCEPTED).exclude(name='new').values('name','creator','have_solution')
-    paginator = Paginator(q_list, 20) 
+    q_list = Question.objects.filter(audited=Question.ACCEPTED).exclude(name='new').values('name','id')
+    paginator = Paginator(q_list, 20)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     return render(request,'puzzle/puzzle_list.html',context={'page_obj':page_obj,'start_index':page_obj.start_index()})
+
+
+def signup(request):
+    if request.method == 'POST':
+        form = Signup(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('/puzzles/')
+        else:
+            return render(request,'puzzle/sign_up.html',{'form':form})
+    else:
+        if not request.user.is_authenticated:
+            form = Signup()
+            return render(request,'puzzle/sign_up.html',{'form':Signup})
+
+
+def profile(request):
+    if request.user.is_authenticated:
+        return render(request,'puzzle/profile.html')
+    return redirect('/puzzles/sign_in')
+
+
+
+
 
 
 def puzzle_submission_page(request,id,submission_id=None):
@@ -67,13 +98,14 @@ def puzzle_submission_page(request,id,submission_id=None):
     if q.name=='new':
         return HttpResponse('<h1>Page was not found</h1>')
     context=vars(q)
-    if submission_id==None:
-        sub_list=Submission.objects.filter(question__id=id,private=False)
-        user_sub_list=Submission.objects.filter(creator__id=request.user.id) if request.user else None
-        return HttpResponse(render(request,'puzzle/display/submission_list.html',context={"section":'submission',"question":context}))# add context
-    else:
+    context['creator']=q.creator.username
+    sub_list=Submission.objects.filter(question__id=id,private=False)
+    user_sub_list=Submission.objects.filter(creator__id=request.user.id) if request.user else None
+    if submission_id:
         sub=Submission.objects.get(id=submission_id)
         view_permission=sub.question.id==q.id and  ((request.user.is_superuser) or \
             (q.name!="new" and((q.private==False) or (request.user.id==sub.creator.id))))
         if view_permission:
-            return HttpResponse(render(request,'puzzle/display/submission_view.html',context={"section":'submission',"question":context,"submission":vars(sub)}))# add context
+            return HttpResponse(render(request,'puzzle/display/submission.html',context={"section":'submission',"question":context,"submission":vars(sub)}))# add context
+    else:
+        return HttpResponse(render(request,'puzzle/display/submission.html',context={"section":'submission',"question":context}))# add context

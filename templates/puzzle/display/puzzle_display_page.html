@@ -1,4 +1,4 @@
-{% extends "puzzle/bone.html" %}
+{% extends "bone.html" %}
 {% load static %}
 
     {% block head %}
@@ -6,6 +6,7 @@
     <title>{{question.name}}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{% static "src/puzzle/style/puzzle_display.css" %}" rel="stylesheet" media="screen">
+
     {% endblock head %}
 
 
@@ -29,10 +30,19 @@
       <li id="sec_submission" class="nav-item">
         <a class="nav-link" href="./submission">Submission</a>
       </li>
+      <!--
       <li id="sec_discussion" class="nav-item">
         <a class="nav-link" href="./discussion">Discussion</a>
       </li>
+      -->
     </ul>
+    <ul class="navbar-nav ml-auto navbar-right">
+
+      <li class="nav-item ">
+        <button id="return_default" title="Return to the default"  ><span class="fas fa-redo"></span></button>
+      </li>
+    </ul>
+
   </div>
 </nav>
 {% endblock app_top %}
@@ -65,8 +75,12 @@
 
 
 {% block bottombar %}
+
     <nav id="bottombar" class="navbar navbar-expand-sm navbar-light bg-transparent">
         <div class="collapse navbar-collapse">
+          <div>
+          Contributed by {{question.creator}}
+          </div>
           <ul class="navbar-nav ml-auto navbar-right">
             <li class="nav-item ">
               <button id="test_solution" class="btn btn-outline-success my-2 my-sm-0" >Test</button>
@@ -77,7 +91,12 @@
     </nav>
 {% endblock %}
 
+{% block vendor %}
+<script  src="{% static "src/puzzle/dist/vendors~display~edit~puzzle~submission.min.js" %}"></script>
+<script  src="{% static "src/puzzle/dist/vendors~display~edit~puzzle~puzzle_list~sign_in~submission.min.js" %}"></script>
+{% endblock %}
+
  {% block src %}
 <input type="hidden" id="q_attr" q_id="{{question.id}}" q_name="{{question.name}}" sec="{{section}}">
-<script  src="{% static "src/puzzle/dist/puzzle_display.min.js" %}"></script>
+<script  src="{% static "src/puzzle/dist/display.min.js" %}"></script>
 {% endblock src %}

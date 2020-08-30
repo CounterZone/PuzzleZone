@@ -16,8 +16,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
+from django.contrib.auth import views as auth_views
+from puzzle import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('puzzles/',include('puzzle.urls'))
+    path('puzzles/',include('puzzle.urls')),
+    path('sign_in/', auth_views.LoginView.as_view(template_name='puzzle/sign_in.html',redirect_authenticated_user=True),name='login'),
+    path('sign_up/', views.signup,name='signup'),
+
+    path('profile/',views.profile),
 ]

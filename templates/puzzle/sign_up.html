@@ -1,0 +1,29 @@
+{% extends "bone.html" %}
+{% load static %}
+{% block head %}
+<title>Sign Up</title>
+<link href="{% static "src/puzzle/style/sign_in.css" %}" rel="stylesheet" media="screen">
+{% endblock head %}
+{% block app_container %}
+
+<div id='login_block'>
+
+
+
+  <form method="post" action="{% url 'signup' %}">
+  {% csrf_token %}
+{{ form.as_p }}
+
+  <button type="submit" value="signup" class="btn btn-outline-success my-2 my-sm-0">Sign Up</button>
+
+  </form>
+
+
+</div>
+
+{% endblock app_container %}
+
+{% block src %}
+<script  src="{% static "src/puzzle/dist/vendors~display~edit~puzzle~puzzle_list~sign_in~submission.min.js" %}"></script>
+<script  src="{% static "src/puzzle/dist/sign_in.min.js" %}"></script>
+{% endblock src %}

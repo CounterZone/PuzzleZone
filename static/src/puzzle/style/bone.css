@@ -1,0 +1,13 @@
+
+#topbar,#bottombar{
+  min-height:40px !important;
+  width:100% !important;
+  padding-left:20px !important;
+}
+#topbar{
+  background-image: linear-gradient(#CCCCCC, #FAFAFA) !important;
+}
+#bottombar{
+  position: absolute !important;
+  bottom: 0 !important;
+}

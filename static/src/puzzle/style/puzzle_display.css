@@ -41,13 +41,19 @@ overflow: auto;
 #app_right_bottom>p{
   margin:0;
 }
+.gutter{
+  background-color: #CCCCCC;
+cursor: grab;
+}
+
 #column-gutter-1{
   grid-column:2;
- grid-row:2/5;border: 0.2px red solid;
+ grid-row:2/5;
 }
 #row-gutter-1{
-  grid-column:3;border: 0.2px red solid;
+  grid-column:3;
  grid-row:3;
+
 }
 #app_container{
   margin:10px;left:0;right:0;
@@ -57,19 +63,11 @@ overflow: auto;
   grid-template-rows: 80px 3fr 10px 1fr;border: 0.2px blue solid;
   bottom: 40px ;
   top:40px;
-}
-#topbar,#bottombar{
-  min-height:40px !important;
-  width:100% !important;
-  padding-left:20px !important;
-  border: 0.2px red solid;
+  background-color: white;
 }
 
-#bottombar{
-  position: absolute !important;
-  bottom: 0 !important;
 
-}
+
 .section{
   margin-left:-20px !important;
     padding-bottom: 0 !important;

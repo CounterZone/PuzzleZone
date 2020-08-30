@@ -1,19 +1,40 @@
 #app_container{
   margin:10px;left:0;right:0;
   position:absolute;
-
+  display: grid;
+  grid-template-columns: 1fr 10px 1fr;
+  grid-template-rows:1fr;
+  border: 2px #CCCCCC solid;
   bottom: 40px ;
   top:40px;
-  text-align: center;
+  background-color: white;
 }
-#topbar,#bottombar{
-  min-height:40px !important;
-  width:100% !important;
-  padding-left:20px !important;
-  border: 0.2px red solid;
+
+#app_left{
+
+grid-column:1;
+grid-row:1;
+padding:10px;
 }
+#app_right{
+    position: relative;
+grid-column:3;
+grid-row:1;
+padding:10px;
+}
+
 #p_list,#p_page{
 display: block !important;
-text-align: center;
 
+}
+
+.gutter{
+  background-color: #CCCCCC;
+cursor: grab;
+}
+#p_page{
+
+  position: absolute !important;
+  bottom: 0 !important;
+  left:50%  !important;
 }

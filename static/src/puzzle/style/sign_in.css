@@ -1,0 +1,26 @@
+#login_block{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px #CCCCCC solid;
+  padding:50px;
+ vertical-align: middle;
+ text-align: center;
+  }
+#app_container{
+  margin:auto;
+
+  position: absolute;
+    top: 35%;
+     left: 50%;
+     transform: translate(-50%, -50%);
+     background-color: #FAFAFA;
+
+}
+
+.form_table{
+  display:table-cell;
+  table-layout: fixed;
+  margin:auto;
+font-size: 20px;
+}

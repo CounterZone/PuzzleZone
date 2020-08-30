@@ -1,8 +1,0 @@
-{% extends "puzzle/display/puzzle_display_page.html" %}
-{% load static %}
-
-
-{% block src %}
-<input type="hidden" id="q_attr" q_id="{{question.id}}" q_name="{{question.name}}" >
-<script  src="{% static "src/puzzle/dist/puzzle_submission.min.js" %}"></script>
-{% endblock src %}

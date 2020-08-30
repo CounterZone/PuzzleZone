@@ -2,10 +2,11 @@ const path = require('path');
 
 module.exports = {
   entry:{'puzzle': './puzzle/puzzle.js',
-  'puzzle_edit':'./puzzle/edit.js',
-  'puzzle_display':'./puzzle/display.js',
+  'edit':'./puzzle/edit.js',
+  'display':'./puzzle/display.js',
   'puzzle_list':'./puzzle/puzzle_list.js',
-  'puzzle_submission':'./puzzle/submission.js'
+  'submission':'./puzzle/submission.js',
+  'sign_in':'./puzzle/sign_in.js'
 
 },
   output: {
@@ -14,8 +15,11 @@ module.exports = {
   },
 
   optimization: {
-        minimize: false
+      splitChunks: {
+        chunks: 'all',
+      },
     },
+
 
   module:{
     rules: [
