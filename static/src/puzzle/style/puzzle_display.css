@@ -29,14 +29,14 @@ grid-row:2;
 }
 
 .app_grid{
-  border: 0.2px gray solid;
+  border: 1px #CCCCCC solid;
   overflow: hidden;
 }
 #app_right_bottom{
 grid-column:3;
 grid-row:4;
 overflow: auto;
-
+white-space: pre;
 }
 #app_right_bottom>p{
   margin:0;
@@ -60,7 +60,7 @@ cursor: grab;
   position:absolute;
   display: grid;
   grid-template-columns: 1fr 10px 1fr;
-  grid-template-rows: 80px 3fr 10px 1fr;border: 0.2px blue solid;
+  grid-template-rows: 80px 3fr 10px 1fr;border: 2px #CCCCCC solid;
   bottom: 40px ;
   top:40px;
   background-color: white;

@@ -1,0 +1,13 @@
+{% extends "bone.html" %}
+{% load static %}
+{% block head %}
+<title>{{user.username}}</title>
+{% endblock head %}
+
+{% block vendor %}
+<script  src="{% static "src/puzzle/dist/vendors~display~edit~puzzle~puzzle_list~sign_in~submission.min.js" %}"></script>
+
+{% endblock %}
+{% block src %}
+<script  src="{% static "src/puzzle/dist/sign_in.min.js" %}"></script>
+{% endblock src %}

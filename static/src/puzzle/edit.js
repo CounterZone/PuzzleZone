@@ -4,8 +4,11 @@ window.$ = window.jQuery = jQuery;
 // this file is for edit
 load_split();
 
+const fsec={"description":['edit','text'],"pre_solution":['edit','code'],"solution":['edit_solution','text'],"solution_code":['edit_solution','code'],"test_cases":['edit_test','text'],"test_code":['edit_test','code']};
 
 var code_editor=load_code_editor();
+var default_code=code_editor.getValue();
+
 var id=$('#q_attr').attr("q_id");
 var q_name=$('#q_attr').attr("q_name");
 var section=$('#q_attr').attr("sec");
@@ -52,7 +55,6 @@ in_preview=true;
 
 function submit(draft){
   save();
-  const fsec={"description":['edit','text'],"pre_solution":['edit','code'],"solution":['edit_solution','text'],"solution_code":['edit_solution','code'],"test_cases":['edit_test','text'],"test_code":['edit_test','code']};
 
   for (const k in fsec)
   $("#f_"+k).val(codify(window.sessionStorage.getItem(id+"."+fsec[k][0]+'.'+fsec[k][1])));
@@ -107,6 +109,24 @@ $("#submit_question").on('click',()=>{
              submit(false);
          }
 });
+
+
+$("#return_default").on('click',()=>{
+code_editor.setValue(default_code)
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 $(document).ready(function() {
     $('#sec_'+section).addClass('active');

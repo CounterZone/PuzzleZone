@@ -3,6 +3,7 @@ from django.http import HttpResponse,Http404
 from .models import Question,Submission
 from django.core.paginator import Paginator
 from .forms import Signup
+from django.contrib.auth import login, authenticate
 
 
 from . import forms
@@ -59,7 +60,7 @@ def puzzle_display_page(request,id,section=None):
 
 def puzzle_list_page(request):
     q_list = Question.objects.filter(audited=Question.ACCEPTED).exclude(name='new').values('name','id')
-    paginator = Paginator(q_list, 20)
+    paginator = Paginator(q_list, 15)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     return render(request,'puzzle/puzzle_list.html',context={'page_obj':page_obj,'start_index':page_obj.start_index()})
@@ -76,17 +77,18 @@ def signup(request):
             login(request, user)
             return redirect('/puzzles/')
         else:
-            return render(request,'puzzle/sign_up.html',{'form':form})
+            return render(request,'auth/sign_up.html',{'form':form})
     else:
         if not request.user.is_authenticated:
             form = Signup()
-            return render(request,'puzzle/sign_up.html',{'form':Signup})
-
+            return render(request,'auth/sign_up.html',{'form':Signup})
+        else:
+            return redirect('/puzzles/')
 
 def profile(request):
     if request.user.is_authenticated:
-        return render(request,'puzzle/profile.html')
-    return redirect('/puzzles/sign_in')
+        return render(request,'auth/profile.html')
+    return redirect('/sign_in')
 
 
 

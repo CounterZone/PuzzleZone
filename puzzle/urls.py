@@ -25,6 +25,6 @@ urlpatterns = [
     path('<int:id>/',views.puzzle_display_page),
     path('<int:id>/submission',views.puzzle_submission_page),
     path('<int:id>/submission/<submission_id>',views.puzzle_submission_page),
-    path('<int:id>/<section>',views.puzzle_display_page),
+    path('<id>/<section>',views.puzzle_display_page),
 
 ]

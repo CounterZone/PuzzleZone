@@ -10,6 +10,10 @@ class PostQuestion(forms.ModelForm):
     class Meta:
         model=Question
         fields=["name","description","pre_solution","test_cases","test_code","solution","solution_code"]
+    def clean(self):
+        super().clean()
+        self.cleaned_data = dict([ (k,v) for k,v in self.cleaned_data.items() if v != 'null' ])
+
 class PostDiscussion(forms.ModelForm):
     class Meta:
         model=Discussion
@@ -25,10 +29,3 @@ class Signup(UserCreationForm):
     class Meta:
         model = User
         fields = ("username", "email", "password1", "password2")
-
-    def save(self, commit=True):
-        user = super(UserCreationForm, self).save(commit=False)
-        user.email = self.cleaned_data["email"]
-        if commit:
-            user.save()
-        return user

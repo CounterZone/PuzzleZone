@@ -88,6 +88,8 @@ class PuzzleConsumer(WebsocketConsumer):
                     self.send_msg('submission_redirect',str(sub.id))
                 elif status=='ExceedTimeLimit':
                     self.send_msg('display','Exceeded time limit!')
+                elif status=='Error':
+                    self.send_msg('display','Error exists!')
 
             elif message['command']=='question_test':
                 a_res=celery_app.send_task('question_test',[q_id])
@@ -98,7 +100,10 @@ class PuzzleConsumer(WebsocketConsumer):
                     self.send_msg('display',result)
                 elif status=='ExceedTimeLimit':
                     self.send_msg('display','Exceeded time limit!')
+                elif status=='Error':
+                    self.send_msg('display','Error exists!')
             self.close()
+            
     def process_celery_message(self,message,log=None):
         '''
         process the message received from the cellery tasks

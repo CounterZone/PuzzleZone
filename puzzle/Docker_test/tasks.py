@@ -34,7 +34,8 @@ client=docker.from_env()
 try:
     container=client.containers.get(CONTAINER_NAME)
 except docker.errors.NotFound:
-    container=client.containers.create('python:3.8.3-buster',
+    image=client.images.get('test_image')
+    container=client.containers.create(image,
     tty=True,detach=True,
     mem_limit=MEM_LIMIT,
     volumes={VOLUME_NAME:{'bind':'/user','mode':'ro'}},
@@ -45,6 +46,9 @@ except docker.errors.NotFound:
     )
 container.start()
 
+class CompileError(Exception):
+    def __init__(self, message):
+        self.message = message
 
 
 
@@ -71,9 +75,12 @@ def sample_test(self,solution,question_id):
                 return False
         return True
     except SoftTimeLimitExceeded:
-        self.update_state(state='TEST_FAIL',meta={'stdout':'ExceedTimeLimit','message':""})
+        docker_clean_up()
+        self.update_state(state='TEST_FAIL',meta={'stdout':'','message':"ExceedTimeLimit"})
         return False
-
+    except CompileError as e:
+        self.update_state(state='TEST_FAIL',meta={'stdout':"",'message':e.message})
+        return False
 
 
 @app.task(bind=True,name='full_test',soft_time_limit=FULL_TIME_LIMIT)
@@ -82,11 +89,11 @@ def full_test(self,solution,question_id):
     run the test on all test test_cases.
     even a case is not passed, the test still continues.
     '''
+    test_count=0
+    pass_count=0
     try:
         q=docker_prepare(solution,question_id)
         test_cases=io.StringIO(json.loads(q.test_cases))
-        test_count=0
-        pass_count=0
         for test_case in test_cases.readlines():
             test_case=test_case.rstrip('\n')
             if test_case[0]=='#': # ignore lines start with #
@@ -101,8 +108,11 @@ def full_test(self,solution,question_id):
                 self.update_state(state='TEST_FAIL',meta={'stdout':result['stdout'],'message':FAIL_MESSAGE.format(test_case_id=test_count,test_args=test_args,test_result=test_result,user_result=result['result'])})
         return 'Succeed.',test_count,pass_count
     except SoftTimeLimitExceeded:
+        docker_clean_up()
         return 'ExceedTimeLimit',test_count,pass_count
-
+    except CompileError as e:
+        self.update_state(state='TEST_FAIL',meta={'stdout':"",'message':e.message})
+        return 'Error',0,0
 
 @app.task(bind=True,name='question_test',soft_time_limit=FULL_TIME_LIMIT)
 def question_test(self,question_id):
@@ -110,12 +120,12 @@ def question_test(self,question_id):
     test the question
     solution is the solution field of question object
     '''
+    test_count=0
+    pass_count=0
     try:
         q=docker_prepare(solution,question_id)
         solution=json.loads(q.solution_code)
         test_cases=io.StringIO(json.loads(q.test_cases))
-        test_count=0
-        pass_count=0
         for test_case in test_cases.readlines():
             test_case=test_case.rstrip('\n')
             if test_case[0]=='#': # ignore lines start with #
@@ -130,8 +140,11 @@ def question_test(self,question_id):
                 self.update_state(state='TEST_FAIL',meta={'stdout':result['stdout'],'message':FAIL_MESSAGE.format(test_case_id=test_count,test_args=test_args,test_result=test_result,user_result=result['result'])})
         return 'Succeed.',test_count,pass_count
     except SoftTimeLimitExceeded:
+        docker_clean_up()
         return 'ExceedTimeLimit',test_count,pass_count
-
+    except CompileError as e:
+        self.update_state(state='TEST_FAIL',meta={'stdout':'','message':e.message})
+        return 'Error',0,0
 
 
 
@@ -145,6 +158,7 @@ def docker_prepare(solution,question_id):
     if solution is not specified, then use question's solution code
     '''
     global SAMPLE_SIZE,PASS_MESSAGE,FAIL_MESSAGE
+    container.start()
     q=Question.objects.get(id=question_id)
     if solution==None:
         solution=q.solution_code
@@ -154,7 +168,11 @@ def docker_prepare(solution,question_id):
     test_file.write(json.loads(q.test_code))
     sol_file.close()
     test_file.close()
-    setting=json.loads(container.exec_run('python /user/run_test.py --get_settings').output)
+    prepare_output=container.exec_run('python /user/run_test.py --get_settings')
+    if prepare_output.exit_code==0:
+        setting=json.loads(prepare_output.output)
+    else:
+        raise CompileError(prepare_output.output.decode('utf8'))
     for item in SETTING_ITEMS:
         if item in setting:
             exec(item+'='+json.dumps(setting[item]))
@@ -177,4 +195,10 @@ def docker_test(test_args,test_result):
             status='FAIL'
         return {'status':status,'result':result,'stdout':stdout}
     else:
-        return {'status':'ERROR','result':c.output,'stdout':''}
+        return {'status':'ERROR','result':c.output.decode('utf8'),'stdout':''}
+
+def docker_clean_up():
+    '''
+    when time limit exceed, clean the container
+    '''
+    container.kill()

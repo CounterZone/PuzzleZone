@@ -68,7 +68,7 @@ export function codify(code){
 
 export function display_log(msg){
   for (var m of msg.split('\n')) if(m)
-    $('#app_right_bottom').append('<p> > '+m+'</p>');
+    $('#app_right_bottom').append('<p>>  '+m+'</p>');
   $('#app_right_bottom').scrollTop($('#app_right_bottom')[0].scrollHeight);// roll to the bottom
 }
 

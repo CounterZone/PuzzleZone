@@ -64,20 +64,32 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 {% endblock app_container %}
+
+
+
+
+
+{% block bottombar %}
+
+    <nav id="bottombar" class="navbar navbar-expand-sm navbar-light bg-transparent">
+        <div class="collapse navbar-collapse">
+
+          <ul class="navbar-nav ml-auto navbar-right">
+            <li class="nav-item ">
+              {% if user.is_authenticated %}
+              <button id="new_post" onclick="location.href='/puzzles/new/edit';" class="btn btn-outline-success my-2 my-sm-0">Post new puzzle</button>
+              {% else %}
+              <button id="new_post" onclick="location.href='/sign_in';" class="btn btn-outline-success my-2 my-sm-0">Post new puzzle</button>
+              {% endif %}
+
+            </li>
+          </ul>
+
+        </div>
+    </nav>
+{% endblock %}
+
 
 
 {% block src %}

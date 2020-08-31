@@ -11,6 +11,10 @@
 
 
   <form method="post" action="{% url 'signup' %}">
+    {% if form.errors %}
+    <div style='color:red'>Failed. Please check your information.</div>
+    {% endif %}
+
   {% csrf_token %}
 {{ form.as_p }}
 

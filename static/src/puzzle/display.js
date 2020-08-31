@@ -8,6 +8,7 @@ load_split();
 $('#app_left').html(render_md(JSON.parse($('#app_left').text())));
 
 var code_editor=load_code_editor();
+var default_code=code_editor.getValue();
 var id=$('#q_attr').attr("q_id"); // the question id
 var section=$('#q_attr').attr("sec");// the section. description/solution
 
@@ -89,6 +90,10 @@ $("#test_solution").on('click',()=>{
 
 $("#submit_solution").on('click',()=>{
     send_test('full_test');
+});
+
+$("#return_default").on('click',()=>{
+code_editor.setValue(default_code)
 });
 
 

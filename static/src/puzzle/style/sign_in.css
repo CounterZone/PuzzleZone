@@ -4,16 +4,15 @@
   align-items: center;
   border: 2px #CCCCCC solid;
   padding:50px;
- vertical-align: middle;
  text-align: center;
   }
 #app_container{
   margin:auto;
 
   position: absolute;
-    top: 35%;
+    top: 45%;
      left: 50%;
-     transform: translate(-50%, -50%);
+     transform: translate(-50%, 0);
      background-color: #FAFAFA;
 
 }
@@ -23,4 +22,16 @@
   table-layout: fixed;
   margin:auto;
 font-size: 20px;
+}
+.helptext,ul{
+font-size: 10px;
+display: block;
+list-style: none;
+}
+ul.errorlist{
+color:red;
+}
+
+input{
+  float:right;
 }

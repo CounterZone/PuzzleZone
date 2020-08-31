@@ -9,9 +9,7 @@
 <div id='login_block'>
 
 
-  {% if form.errors %}
-  <p>Your username and password didn't match. Please try again.</p>
-  {% endif %}
+
 
   {% if next %}
       {% if user.is_authenticated %}
@@ -24,6 +22,11 @@
 
   <form method="post" action="{% url 'login' %}">
   {% csrf_token %}
+
+  {% if form.errors %}
+  <div style='color:red'>Your username and password didn't match. Please try again.</div>
+  {% endif %}
+
   <table class='form_table'>
   <tr>
       <td>{{ form.username.label_tag }}</td>
