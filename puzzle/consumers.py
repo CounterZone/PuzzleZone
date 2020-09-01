@@ -31,20 +31,25 @@ class PuzzleConsumer(WebsocketConsumer):
     one user can only have one connection.
     '''
     def connect(self):
+        self.accept()
+        if self.scope["user"].is_anonymous:
+            self.send_msg('display','Please sign in!')
+            self.close()
+            return
         self.scope['session']['task_in_running']=False
-
         task_in_running=False if 'task_in_running' not in self.scope['session'] else self.scope['session']['task_in_running']
         if task_in_running:
             self.send_msg('display','You have task in running!')
-            self.close()
+            self.close(code=1) # task_in_running
             return
         self.user = self.scope["user"]
         self.scope['session']['task_in_running']=True
         self.scope['session'].save()
-        self.accept()
+
     def disconnect(self, close_code):
-        self.scope['session']['task_in_running']=False
-        self.scope['session'].save()
+        if close_code!=1:
+            self.scope['session']['task_in_running']=False
+            self.scope['session'].save()
     def send_msg(self,cmd,msg,target='client'):
         '''
         if target = 'client', send the msg to the client
@@ -103,7 +108,7 @@ class PuzzleConsumer(WebsocketConsumer):
                 elif status=='Error':
                     self.send_msg('display','Error exists!')
             self.close()
-            
+
     def process_celery_message(self,message,log=None):
         '''
         process the message received from the cellery tasks

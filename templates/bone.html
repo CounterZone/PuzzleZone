@@ -13,7 +13,7 @@
 
 {% block topbar %}
 <nav id="topbar" class="navbar navbar-expand-sm navbar-light bg-transparent">
-  <img src="{% static "image/logo.png" %}" style="height:35px;cursor:pointer;" onclick="location.href='/puzzles/'">
+  <img src="{% static "image/logo.png" %}" style="height:25px;cursor:pointer;" onclick="location.href='/puzzles/'">
 
 
 <ul class="navbar-nav ml-auto navbar-right">
@@ -43,6 +43,7 @@
 {% endblock %}
 
 {% block vendor %}
+<script  src="{% static "src/puzzle/dist/bundle.min.js" %}"></script>
 {% endblock %}
 {% block src %}
 

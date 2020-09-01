@@ -13,7 +13,10 @@
 {% block app_container %}
       <div id="app_top">
         {% block title %}
-              <h4 style="padding-left:5px">{{question.name}}</h4>
+              <span id="q_name" style="padding-left:5px">{{question.name}}</span>
+              {% if edit_permission %}
+                  <button title="Edit" class="btn btn-sm btn-light" onclick="location.href='edit';" ><span class="fas fa-edit"></span></button>
+              {% endif %}
         {% endblock title %}
 {% block app_top %}
               <nav class="navbar navbar-expand-sm navbar-light bg-transparent section">
@@ -24,9 +27,19 @@
       <li id="sec_description" class="nav-item ">
         <a class="nav-link" href="./">Description </a>
       </li>
-      <li id="sec_solution"  class="nav-item">
+      {% if question.have_solution %}
+
+      <li id="sec_solution"   class="nav-item">
         <a class="nav-link" href="./solution">Solution</a>
       </li>
+
+      {% else %}
+
+      <li id="sec_solution"   class="nav-item">
+        <a class="nav-link disabled" >Solution</a>
+      </li>
+
+      {% endif %}
       <li id="sec_submission" class="nav-item">
         <a class="nav-link" href="./submission">Submission</a>
       </li>
@@ -39,7 +52,7 @@
     <ul class="navbar-nav ml-auto navbar-right">
 
       <li class="nav-item ">
-        <button id="return_default" title="Return to the default"  ><span class="fas fa-redo"></span></button>
+        <button id="return_default" title="Return to the default" class="btn btn-sm btn-light" ><span class="fas fa-undo"></span></button>
       </li>
     </ul>
 
@@ -91,10 +104,7 @@
     </nav>
 {% endblock %}
 
-{% block vendor %}
-<script  src="{% static "src/puzzle/dist/vendors~display~edit~puzzle~submission.min.js" %}"></script>
-<script  src="{% static "src/puzzle/dist/vendors~display~edit~puzzle~puzzle_list~sign_in~submission.min.js" %}"></script>
-{% endblock %}
+
 
  {% block src %}
 <input type="hidden" id="q_attr" q_id="{{question.id}}" q_name="{{question.name}}" sec="{{section}}">

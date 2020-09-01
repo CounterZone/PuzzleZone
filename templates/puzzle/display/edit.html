@@ -16,17 +16,17 @@
 {% block title %}
 
 {% if question.name == "new" %}
-<input style="font-size: 1em;padding-left:5px"  maxlength="256" id="q_name" value="* enter your title here *">
+<input type ="text"  maxlength="256" id="q_name" value="* enter your title here *">
 {% else %}
-<h4 style="padding-left:5px" id="q_name">{{question.name}}</h4>
+<input type ="text"  maxlength="256" id="q_name" value="{{question.name}}">
 {% endif %}
-
+<button title="Return to the question page" class="btn btn-sm btn-light" onclick="location.href='.';" ><span class="fas fa-home"></span></button>
 {% endblock title %}
 
 {% block app_top %}
   <nav class="navbar navbar-expand-sm navbar-light bg-transparent section">
   <div class="collapse navbar-collapse">
-    <ul class="navbar-nav mr-auto">
+    <ul class="navbar-nav mr-2">
       <li id="sec_edit" class="nav-item ">
         <a class="nav-link" href="./edit">Description </a>
       </li>
@@ -37,10 +37,26 @@
         <a class="nav-link" href="./edit_test">Test</a>
       </li>
     </ul>
+
+    <ul class="navbar-nav ml-0 mr-2" >
+      <li class="nav-item mr-4">
+        <button id="return_default_edit" title="Return to your last draft"  class="btn btn-sm btn-light"><span class="fas fa-undo"></span></button>
+      </li>
+      {% if section == "edit_solution" %}
+
+      <li class="nav-item ">
+        <a><i>have solution</i> <input id="have_solution" type="checkbox">  </a>
+      </li>
+      {% else  %}
+      <input id="have_solution" type="checkbox" style="display:none"> 
+
+      {% endif  %}
+
+    </ul>
     <ul class="navbar-nav ml-auto navbar-right">
 
       <li class="nav-item ">
-        <button id="return_default" title="Return to the default"  ><span class="fas fa-redo"></span></button>
+        <button id="return_default_code" title="Return to your last draft"  class="btn btn-sm btn-light"><span class="fas fa-undo"></span></button>
       </li>
     </ul>
 

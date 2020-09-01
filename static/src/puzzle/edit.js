@@ -14,24 +14,31 @@ var q_name=$('#q_attr').attr("q_name");
 var section=$('#q_attr').attr("sec");
 var in_preview=false;
 $('#description_editor').val(JSON.parse($('#description_editor').val()));
+var default_edit=$('#description_editor').val();
 
 
 
 function save(){
   if(typeof(Storage)==undefined)
     return;
-    if (q_name=='new')window.sessionStorage.setItem('1.name',$('#q_name').val());
+window.sessionStorage.setItem(id+'.'+'name',$('#q_name').val());
   window.sessionStorage.setItem(id+'.'+section+'.code',code_editor.getValue());
   window.sessionStorage.setItem(id+'.'+section+'.text',$('#description_editor').val());
+  window.sessionStorage.setItem(id+'.have_solution',document.getElementById("f_have_solution").checked);
+
+
 }
 function load(){
   if(typeof(Storage)==undefined)
     return;
-    if (q_name=='new')$("#q_name").val(window.sessionStorage.getItem('1.name'));
+    document.getElementById("f_have_solution").checked=window.sessionStorage.getItem(id+'.have_solution')
+    var name= window.sessionStorage.getItem(id+'.'+'name');
+
   var sol=window.sessionStorage.getItem(id+'.'+section+'.code');
   var des=window.sessionStorage.getItem(id+'.'+section+'.text');
   if (sol)code_editor.setValue(sol,-1);
   if (des)$('#description_editor').val(des);
+  if (name)$("#q_name").val(name);
 }
 load();
 window.addEventListener('beforeunload',save);
@@ -59,11 +66,12 @@ function submit(draft){
   for (const k in fsec)
   $("#f_"+k).val(codify(window.sessionStorage.getItem(id+"."+fsec[k][0]+'.'+fsec[k][1])));
 
-  if (q_name=='new')$("#f_name").val(window.sessionStorage.getItem('1.name'));
-  else $("#f_name").val($('#q_name').text());
+$("#f_name").val(window.sessionStorage.getItem(id+'.'+'name'));
 
   document.getElementById("f_isdraft").checked = draft;
+  document.getElementById("f_have_solution").checked = document.getElementById("have_solution").checked;
   document.getElementById("q_form").submit();
+
 }
 
 
@@ -105,16 +113,20 @@ $("#test_question").on('click',()=>{
 
 
 $("#submit_question").on('click',()=>{
-  if (confirm("Once submitted, it cannot be editted. Are you sure?")) {
-             submit(false);
-         }
+      submit(false);
 });
 
 
-$("#return_default").on('click',()=>{
-code_editor.setValue(default_code)
+$("#return_default_code").on('click',()=>{
+code_editor.setValue(default_code);
+
+
 });
 
+$("#return_default_edit").on('click',()=>{
+$('#description_editor').val(default_edit);
+
+});
 
 
 

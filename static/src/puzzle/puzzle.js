@@ -26,9 +26,12 @@ export function load_split(){
   rowGutters: [{
     track: 2,
     element: document.querySelector('#row-gutter-1'),
-  }]
+  }],
+  columnMinSize:250
 });
 }
+
+
 export function load_code_editor(){
   /*
  * load the ace code editor to the right-top grid of the layout

@@ -22,12 +22,11 @@ MEM_LIMIT='1g'
 
 FULL_TIME_LIMIT=120 # second
 SAMPLE_TIME_LIMIT=30
-
-SAMPLE_SIZE=10
-FAIL_MESSAGE='test case {test_case_id}:failed!\nfailed case: {test_args}\nexpected result:{test_result}\nyour result:{user_result}\n'
-PASS_MESSAGE='test case {test_case_id}:passed!\n'
-
-SETTING_ITEMS=['SAMPLE_SIZE','FAIL_MESSAGE','PASS_MESSAGE']
+SETTINGS={
+'SAMPLE_SIZE':10,
+'FAIL_MESSAGE':'test case {test_case_id}:failed!\nfailed case: {test_args}\nexpected result:{test_result}\nyour result:{user_result}\n',
+'PASS_MESSAGE':'test case {test_case_id}:passed!\n',
+}
 
 
 client=docker.from_env()
@@ -60,10 +59,15 @@ def sample_test(self,solution,question_id):
     '''
     try:
         q=docker_prepare(solution,question_id)
+        SAMPLE_SIZE=SETTINGS['SAMPLE_SIZE']
+        PASS_MESSAGE=SETTINGS['PASS_MESSAGE']
+        FAIL_MESSAGE=SETTINGS['FAIL_MESSAGE']
         test_cases=io.StringIO(json.loads(q.test_cases))
         for i in range(SAMPLE_SIZE):
             test_case=test_cases.readline().rstrip('\n')
-            if test_case[0]=='#': # ignore lines start with #
+            if not test_case:
+                break
+            if  test_case[0]=='#': # ignore lines start with #
                 i=i-1
                 continue
             test_args,test_result=test_case.split(':')
@@ -93,6 +97,8 @@ def full_test(self,solution,question_id):
     pass_count=0
     try:
         q=docker_prepare(solution,question_id)
+        PASS_MESSAGE=SETTINGS['PASS_MESSAGE']
+        FAIL_MESSAGE=SETTINGS['FAIL_MESSAGE']
         test_cases=io.StringIO(json.loads(q.test_cases))
         for test_case in test_cases.readlines():
             test_case=test_case.rstrip('\n')
@@ -124,6 +130,8 @@ def question_test(self,question_id):
     pass_count=0
     try:
         q=docker_prepare(solution,question_id)
+        PASS_MESSAGE=SETTINGS['PASS_MESSAGE']
+        FAIL_MESSAGE=SETTINGS['FAIL_MESSAGE']
         solution=json.loads(q.solution_code)
         test_cases=io.StringIO(json.loads(q.test_cases))
         for test_case in test_cases.readlines():
@@ -173,9 +181,9 @@ def docker_prepare(solution,question_id):
         setting=json.loads(prepare_output.output)
     else:
         raise CompileError(prepare_output.output.decode('utf8'))
-    for item in SETTING_ITEMS:
+    for item in SETTINGS:
         if item in setting:
-            exec(item+'='+json.dumps(setting[item]))
+            SETTINGS[item]=setting[item]
     return q
 
 def docker_test(test_args,test_result):

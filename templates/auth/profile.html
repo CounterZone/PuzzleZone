@@ -1,13 +1,86 @@
 {% extends "bone.html" %}
+
+
 {% load static %}
+
 {% block head %}
 <title>{{user.username}}</title>
+<link href="{% static "src/puzzle/style/profile.css" %}" rel="stylesheet" media="screen">
 {% endblock head %}
 
-{% block vendor %}
-<script  src="{% static "src/puzzle/dist/vendors~display~edit~puzzle~puzzle_list~sign_in~submission.min.js" %}"></script>
 
-{% endblock %}
+{% block title %}
+      <h4 style="padding-left:5px">{{user.username}}</h4>
+{% endblock title %}
+
+
+{% block app_container %}
+<div id="app_left" class="app_grid">
+
+  <div class="row">
+
+      <div class="col">
+        <hr>
+
+          <h4>{{user.username}}</h4>
+
+          <hr>
+
+                    <p>
+                        <a href="">My Pastes</a> <br>
+                        <a href="">Account Details</a> <br>
+                        <a href="/password-change/">Change Password.</a> <br>
+                    </p>
+
+
+
+                    <hr>
+                    <h5>Change Account information</h5>
+                    <hr>
+
+          <form action="" method="post" class="form-horizontal" >
+              {% csrf_token %}
+
+              <table class="table">
+                  {{ form.as_table }}
+                  <tr>
+                      <td>&nbsp;</td>
+                      <td><button type="submit" class="btn btn-primary">Submit</button></td>
+                  </tr>
+              </table>
+
+          </form>
+          <hr>
+          <hr>
+          <form action="{% url 'logout' %}">
+              <button type="submit" class="btn btn-secondary">Log out</button>
+          </form>
+
+
+      </div>
+
+
+  </div>
+
+</div>
+
+<div id="column-gutter-1" class='gutter'>
+</div>
+
+<div id="app_right" class="app_grid">
+
+</div>
+
+
+{% endblock app_container %}
+
+
+
+
+
+
 {% block src %}
-<script  src="{% static "src/puzzle/dist/sign_in.min.js" %}"></script>
+
+<script  src="{% static "src/puzzle/dist/profile.min.js" %}"></script>
+
 {% endblock src %}

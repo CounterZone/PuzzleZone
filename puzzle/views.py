@@ -2,12 +2,13 @@ from django.shortcuts import render,redirect
 from django.http import HttpResponse,Http404
 from .models import Question,Submission
 from django.core.paginator import Paginator
-from .forms import Signup
-from django.contrib.auth import login, authenticate
-
-
+from .forms import SignupForm,ProfileChangeForm
+from django.contrib.auth import login, authenticate,logout
+from django.contrib.auth.models import User
 from . import forms
-# Create your views here.
+from django.contrib.auth import logout
+
+
 def puzzle_display_page(request,id,section=None):
     try:
         if id=="new":
@@ -46,7 +47,7 @@ def puzzle_display_page(request,id,section=None):
                 context=vars(q)
                 context['creator']=q.creator.username
                 context["section"]=section
-                return HttpResponse(render(request,'puzzle/display/'+section+'.html',context={"section":section,"question":context}))
+                return HttpResponse(render(request,'puzzle/display/'+section+'.html',context={"section":section,"question":context,"edit_permission":edit_permission}))
             else:
                 pass # redirect
         elif section in ["edit","edit_solution","edit_test"]:
@@ -68,7 +69,7 @@ def puzzle_list_page(request):
 
 def signup(request):
     if request.method == 'POST':
-        form = Signup(request.POST)
+        form = SignupForm(request.POST)
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
@@ -78,21 +79,34 @@ def signup(request):
             return redirect('/puzzles/')
         else:
             return render(request,'auth/sign_up.html',{'form':form})
-    else:
+    elif request.method == 'GET':
         if not request.user.is_authenticated:
-            form = Signup()
-            return render(request,'auth/sign_up.html',{'form':Signup})
+            form = SignupForm()
+            return render(request,'auth/sign_up.html',{'form':form})
         else:
             return redirect('/puzzles/')
 
+
 def profile(request):
-    if request.user.is_authenticated:
-        return render(request,'auth/profile.html')
-    return redirect('/sign_in')
+    if request.method == 'GET':
+        if request.user.is_authenticated:
+            user = User.objects.get(id=request.user.id)
+            return render(request,'auth/profile.html',context={'form':ProfileChangeForm(user)})
+        return redirect('/sign_in')
+    elif request.method == 'POST':
+        user = User.objects.get(id=request.user.id)
+        form = ProfileChangeForm(user,request.POST)
+        if form.is_valid():
+            form.save()
+            login(request, user)
+            return redirect('/profile/')
+        else:
+            return render(request,'auth/profile.html',{'form':form})
 
 
-
-
+def logout_view(request):
+    logout(request)
+    return redirect('/puzzles/')
 
 
 def puzzle_submission_page(request,id,submission_id=None):

@@ -1,0 +1,43 @@
+#app_container{
+  margin:10px;left:0;right:0;
+  position:absolute;
+  display: grid;
+  grid-template-columns: 0.6fr 10px 1fr;
+  grid-template-rows:1fr;
+  border: 2px #CCCCCC solid;
+  bottom: 40px ;
+  top:40px;
+  background-color: white;
+
+}
+
+#app_left{
+grid-column:1;
+grid-row:1;
+padding:10px;
+padding-top:20px;
+display: flex;
+}
+#app_right{
+    position: relative;
+grid-column:3;
+grid-row:1;
+padding:10px;
+}
+.gutter{
+  background-color: #CCCCCC;
+cursor: grab;
+}
+
+.helptext,.helptext ul{
+font-size: 10px;
+display: block;
+list-style: none;
+}
+ul.errorlist{
+color:red;font-size: 10px;
+
+}
+.helptext ul{
+  padding-left: 0;
+}

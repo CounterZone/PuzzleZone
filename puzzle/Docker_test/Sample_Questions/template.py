@@ -22,7 +22,7 @@ SETTING={
 # PASS_MESSAGE would show for every case passed
 'PASS_MESSAGE':'test case {test_case_id}:passed!\n',
 #
-'SAMPLE_TEST_SIZE':10
+'SAMPLE_SIZE':10
 }
 
 # testcases

@@ -12,11 +12,14 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+#q_name{
+  font-size: 30px;
+  margin-bottom:5px;
+}
 
 #app_top{
 grid-column:1/4;
 grid-row:1;
-height:20 px;
 }
 #app_left{
 grid-column:1;
@@ -60,7 +63,7 @@ cursor: grab;
   position:absolute;
   display: grid;
   grid-template-columns: 1fr 10px 1fr;
-  grid-template-rows: 80px 3fr 10px 1fr;border: 2px #CCCCCC solid;
+  grid-template-rows: 100px 3fr 10px 1fr;border: 2px #CCCCCC solid;
   bottom: 40px ;
   top:40px;
   background-color: white;
@@ -72,8 +75,7 @@ cursor: grab;
   margin-left:-20px !important;
     padding-bottom: 0 !important;
   padding-top: 0 !important;
-
-  min-height: 20px;
+  font-size: 20px;
 }
 
 #description_editor,#preview{
