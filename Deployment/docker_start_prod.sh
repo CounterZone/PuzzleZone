@@ -3,4 +3,7 @@ sh webpack_build.sh
 docker volume create puzzlezone_user_test
 
 docker-compose -f docker-compose-prod.yml build
-docker-compose -f docker-compose-prod.yml  up
+
+docker build ../puzzle/Docker_test -t test_image
+
+docker-compose -f docker-compose-prod.yml -d  up

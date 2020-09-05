@@ -11,6 +11,7 @@ upstream puzzlezone_ws {
 # configuration of the server
 server {
     listen      80;
+    listen [::]:80; 
 
     location / {
             uwsgi_pass  puzzlezone;
