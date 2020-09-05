@@ -33,7 +33,6 @@ grid-row:2;
 
 .app_grid{
   border: 1px #CCCCCC solid;
-  overflow: hidden;
 }
 #app_right_bottom{
 grid-column:3;

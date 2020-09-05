@@ -12,7 +12,8 @@ class test: # don't change this line
         test_args: string. the test_args in the testcases(the assigned result not included).
         '''
         your_args=your_parser(test_args) # you need to parse your test args
-        result=your_solution_class.your_method_name(your_args)
+        solution_instance=your_solution_class()
+        result=solution_instance.your_method_name(your_args)
         return your_seralizer(result) # you need to return a string that could be compared with the test_result
 
 

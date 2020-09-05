@@ -1,0 +1,28 @@
+
+upstream puzzlezone {
+    server web:8001;
+}
+upstream puzzlezone_ws {
+    server ws:8001;
+}
+
+
+
+# configuration of the server
+server {
+    listen      80;
+
+    location / {
+            uwsgi_pass  puzzlezone;
+            include uwsgi_params;
+        }
+    location /static/ {
+        alias /home/app/static/;
+    }
+    location /ws/ {
+        proxy_set_header Host $host;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_pass http://puzzlezone_ws;
+    }
+}

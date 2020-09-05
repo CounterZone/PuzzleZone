@@ -8,7 +8,6 @@ websocket api
 legal message received:
 {'command':'sample_test', 'solution':solution_code, 'question_id':q_id}
 {'command':'full_test', 'solution':solution_code, 'question_id':q_id}
-{'command':'question_test','question_id':q_id}
 
 legal message to send:
 {'command':'display','message':msg}
@@ -84,29 +83,16 @@ class PuzzleConsumer(WebsocketConsumer):
                 creator=self.user,
                 question=Question.objects.get(id=q_id),
                 code=sol,
-                log='\n'.join(log),
+                log=''.join(log),
                 result=result,
                 score=score
                 )
                 sub.save()
-                if status=='Succeed.':
-                    self.send_msg('submission_redirect',str(sub.id))
-                elif status=='ExceedTimeLimit':
+                if status=='ExceedTimeLimit':
                     self.send_msg('display','Exceeded time limit!')
                 elif status=='Error':
                     self.send_msg('display','Error exists!')
-
-            elif message['command']=='question_test':
-                a_res=celery_app.send_task('question_test',[q_id])
-                m=a_res.get(on_message=self.process_celery_message,propagate=False)
-                status,pass_num,tot_num=m
-                result=status+' {p:d}/{t:d} passed.'.format(p=pass_num,t=tot_num)
-                if status=='Succeed.':
-                    self.send_msg('display',result)
-                elif status=='ExceedTimeLimit':
-                    self.send_msg('display','Exceeded time limit!')
-                elif status=='Error':
-                    self.send_msg('display','Error exists!')
+                self.send_msg('submission_redirect',str(sub.id))
             self.close()
 
     def process_celery_message(self,message,log=None):
@@ -122,6 +108,6 @@ class PuzzleConsumer(WebsocketConsumer):
         if message['status'] in ['TEST_PASS','TEST_FAIL']:
             self.send_msg('display',message['result']['stdout'])
             self.send_msg('display',message['result']['message'])
-            if log:
+            if log!=None:
                 self.send_msg('display',message['result']['stdout'])
                 self.send_msg('display',message['result']['message'],log)

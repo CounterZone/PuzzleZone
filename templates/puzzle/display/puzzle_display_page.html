@@ -41,7 +41,7 @@
 
       {% endif %}
       <li id="sec_submission" class="nav-item">
-        <a class="nav-link" href="./submission">Submission</a>
+        <a class="nav-link" href="./submission/user">Submission</a>
       </li>
       <!--
       <li id="sec_discussion" class="nav-item">
@@ -50,10 +50,13 @@
       -->
     </ul>
     <ul class="navbar-nav ml-auto navbar-right">
+      {% block right-top-button %}
 
       <li class="nav-item ">
         <button id="return_default" title="Return to the default" class="btn btn-sm btn-light" ><span class="fas fa-undo"></span></button>
       </li>
+      {% endblock right-top-button %}
+
     </ul>
 
   </div>

@@ -27,9 +27,7 @@
           <hr>
 
                     <p>
-                        <a href="">My Pastes</a> <br>
-                        <a href="">Account Details</a> <br>
-                        <a href="/password-change/">Change Password.</a> <br>
+                        <a href="?my_puzzle">My Puzzles</a> <br>
                     </p>
 
 
@@ -68,6 +66,29 @@
 </div>
 
 <div id="app_right" class="app_grid">
+
+
+    <div id="p_list" class="list-group">
+
+      {% for question in page_obj %}
+
+      <a href="/puzzles/{{question.id}}" class="list-group-item list-group-item-action">{{ question.name }}
+
+        <i style='font-weight:bold;position:absolute;right:50px;'>
+        {% if question.audited == '0' %}
+        <span style='color:yellow'>draft</span>
+        {% elif  question.audited == '1' %}
+        <span style='color:red'>submitted</span>
+        {% elif  question.audited == '2' %}
+        <span style='color:green'>accepted</span>
+        {% endif %}
+        </i>
+      </a>
+
+      {% endfor %}
+
+    </div>
+
 
 </div>
 

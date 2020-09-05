@@ -1,5 +1,0 @@
-docker commit puzzlezone_web_1 puzzlezone/web
-docker commit puzzlezone_worker_1 puzzlezone/worker
-docker commit puzzlezone_rabbit_1 puzzlezone/rabbit
-docker commit puzzlezone_postgres_1 puzzlezone/postgres
-docker commit user_test puzzlezone/test_image

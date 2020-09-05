@@ -2,11 +2,113 @@
 {% load static %}
 
 
+{% block app_left %}
+
+
+<div id="p_list" class="list-group">
+
+  <nav  class="navbar navbar-expand-sm navbar-light bg-transparent">
+
+  <div class="navbar-nav mr-auto">
+    <li class="nav-item ">
+      <a class="nav-link" href="user">My submission </a>
+      </li>
+      <li class="nav-item ">
+        <a class="nav-link" href="public">Published submission </a>
+        </li>
+    </ul>
+    </nav>
+  {% for sub in page_obj %}
+
+  <a href="?submission={{sub.id}}" class="list-group-item list-group-item-action {%if sub.id == submission.id %} active {% endif %} " >
+    {{ forloop.counter0|add:0 }}.{{ sub.name }} {{sub.result}}  {{sub.create_time}} -- by {{sub.creator}}{%if not sub.private %} <span class="fas fa-newspaper"> {% endif %}
+  </a>
+
+  {% endfor %}
+
+</div>
+
+{% endblock %}
+
 {% block app_righttop %}
 {{submission.code}}
+
+{% endblock %}
+
+
+{% block app_rightbot %}
+{{submission.log}}
+
+{% endblock %}
+{% block app_top %}
+              <nav class="navbar navbar-expand-sm navbar-light bg-transparent section">
+
+
+  <div class="collapse navbar-collapse">
+    <ul class="navbar-nav mr-auto">
+      <li id="sec_description" class="nav-item ">
+        <a class="nav-link" href="../">Description </a>
+      </li>
+      {% if question.have_solution %}
+
+      <li id="sec_solution"   class="nav-item">
+        <a class="nav-link" href="../solution">Solution</a>
+      </li>
+
+      {% else %}
+
+      <li id="sec_solution"   class="nav-item">
+        <a class="nav-link disabled" >Solution</a>
+      </li>
+
+      {% endif %}
+      <li id="sec_submission" class="nav-item">
+        <a class="nav-link" href="./user">Submission</a>
+      </li>
+      <!--
+      <li id="sec_discussion" class="nav-item">
+        <a class="nav-link" href="./discussion">Discussion</a>
+      </li>
+      -->
+    </ul>
+    <ul class="navbar-nav ml-auto navbar-right">
+
+      <li class="nav-item ">
+        <form method="post" >
+            {% csrf_token %}
+            <input id='command' type="hidden" name="command" value="delete">
+            <button type='submit' id="delete" title="Delete this submission" class="btn btn-sm btn-light " {%if not submission %} disabled {% endif %} ><span class="fas fa-trash"></span></button>
+        </form>
+      </li>
+      <li class="nav-item ">
+        <form method="post" >
+            {% csrf_token %}
+            <input id='command' type="hidden" name="command" value="publish">
+        <button type='submit' id="Publish" title="Publish this submission" class="btn btn-sm btn-light " {%if not submission.private %} disabled {% endif %} ><span class="fas fa-newspaper"></span></button>
+        </form>
+      </li>
+
+
+    </ul>
+
+  </div>
+</nav>
+{% endblock app_top %}
+
+
+
+{% block bottombar %}
+
+    <nav id="bottombar" class="navbar navbar-expand-sm navbar-light bg-transparent">
+        <div class="collapse navbar-collapse">
+          <div>
+          Contributed by {{question.creator}}
+          </div>
+        </div>
+    </nav>
 {% endblock %}
 
 {% block src %}
 <input type="hidden" id="q_attr" q_id="{{question.id}}" q_name="{{question.name}}">
-<script  src="{% static "src/puzzle/dist/puzzle_submission.min.js" %}"></script>
+<script  src="{% static "src/puzzle/dist/submission.min.js" %}"></script>
 {% endblock src %}

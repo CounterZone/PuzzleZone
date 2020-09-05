@@ -1,32 +1,59 @@
 from django.shortcuts import render,redirect
-from django.http import HttpResponse,Http404
+from django.http import HttpResponse,Http404,HttpResponseRedirect
+
+from django.core.exceptions import PermissionDenied,ObjectDoesNotExist
+
 from .models import Question,Submission
-from django.core.paginator import Paginator
-from .forms import SignupForm,ProfileChangeForm
+from .forms import SignupForm,ProfileChangeForm,PostQuestion
+
+from django.views.generic.list import ListView,View
 from django.contrib.auth import login, authenticate,logout
 from django.contrib.auth.models import User
-from . import forms
 from django.contrib.auth import logout
+from django.contrib.auth import views as auth_views
+
+def raise_404(method):
+    def wrap(*args, **kwargs):
+        try:
+            return method(*args, **kwargs)
+        except ObjectDoesNotExist:
+            raise Http404()
+    return wrap
+
+def question_permission_check(option,question,request,check=True):
+    '''
+    option: 'view' or 'edit'
+    if check==true, raise exceptions. otherwise return the result
+    '''
+    q=question
+    if option=='view':
+        if not ((request.user.is_superuser) or (q.name!="new" and((q.audited==Question.ACCEPTED) \
+                        or (request.user.is_authenticated and request.user.username==q.creator.username)))):
+            if check:
+                raise PermissionDenied()
+            return False
+    elif option=='edit':
+        if not ((request.user.is_superuser) or (request.user.is_authenticated and \
+                        (q.name=="new" or (request.user.username==q.creator.username)))):
+            if check:
+                raise PermissionDenied()
+            return False
+    return True
 
 
-def puzzle_display_page(request,id,section=None):
-    try:
+class puzzle_display_view(View):
+    @raise_404
+    def post(self,request,id,section='description'):
         if id=="new":
             q=Question.objects.get(name='new')
         else:
             q=Question.objects.get(id=id)
             if q.name=='new':
-                throw()
-    except:
-        return HttpResponse('<h1>Page was not found</h1>')
-    view_permission=(request.user.is_superuser) or (q.name!="new" and((q.audited==Question.ACCEPTED) \
-                    or (request.user.is_authenticated and request.user.username==q.creator.username)))
-    edit_permission= (request.user.is_superuser) or (request.user.is_authenticated and \
-                    (q.name=="new" or (request.user.username==q.creator.username and q.audited==Question.DRAFT)))
-    if request.method=="POST":
-        if section in ["edit","edit_solution","edit_test"] and edit_permission:
+                raise Http404()
+        question_permission_check('edit',q,request)
+        if section in ["edit","edit_solution","edit_test"]:
             instance=q if q.name!='new' else None
-            posted_question=forms.PostQuestion(request.POST,instance=instance)
+            posted_question=PostQuestion(request.POST,instance=instance)
             if posted_question.is_valid():
                 p=posted_question.save(False)
                 if p.name=="new":
@@ -39,36 +66,40 @@ def puzzle_display_page(request,id,section=None):
             else:
                 return HttpResponse('<h1>Invalid submission</h1>')
             return redirect("/puzzles/"+str(posted_question.instance.id)+'/edit')
-    elif request.method=="GET":
-        if not section:
-            section="description"
+    @raise_404
+    def get(self,request,id,section='description'):
+        if id=="new":
+            q=Question.objects.get(name='new')
+        else:
+            q=Question.objects.get(id=id)
+            if q.name=='new':
+                raise Http404()
         if section in ["description","solution"] and id!="new":
-            if view_permission:
                 context=vars(q)
                 context['creator']=q.creator.username
                 context["section"]=section
-                return HttpResponse(render(request,'puzzle/display/'+section+'.html',context={"section":section,"question":context,"edit_permission":edit_permission}))
-            else:
-                pass # redirect
+                return HttpResponse(render(request,'puzzle/display/'+section+'.html',context={"section":section,"question":context,"edit_permission":question_permission_check('edit',q,request,check=False)}))
         elif section in ["edit","edit_solution","edit_test"]:
-            if edit_permission:
+                question_permission_check('edit',q,request)
                 context=vars(q)
-                return HttpResponse(render(request,'puzzle/display/'+section+'.html',context={"section":section,"question":context,"question_form":forms.PostQuestion(auto_id='f_%s')}))
-            else:
-                pass # redirect
+                return HttpResponse(render(request,'puzzle/display/'+section+'.html',context={"section":section,"question":context,"question_form":PostQuestion(auto_id='f_%s')}))
         else:
-            return HttpResponse('<h1>Page was not found</h1>')
+            raise Http404('<h1>Page was not found</h1>')
 
-def puzzle_list_page(request):
-    q_list = Question.objects.filter(audited=Question.ACCEPTED).exclude(name='new').values('name','id')
-    paginator = Paginator(q_list, 15)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    return render(request,'puzzle/puzzle_list.html',context={'page_obj':page_obj,'start_index':page_obj.start_index()})
+class puzzle_list_view(ListView):
+    model=Question
+    paginate_by = 15
+    template_name = 'puzzle/puzzle_list.html'
+    context_object_name = 'puzzle_list'
+    queryset=Question.objects.filter(audited=Question.ACCEPTED).exclude(name='new').values('name','id')
+
+class signin_view(auth_views.LoginView):
+    template_name='auth/sign_in.html'
+    redirect_authenticated_user=True
 
 
-def signup(request):
-    if request.method == 'POST':
+class signup_view(View):
+    def post(self,request):
         form = SignupForm(request.POST)
         if form.is_valid():
             form.save()
@@ -79,7 +110,7 @@ def signup(request):
             return redirect('/puzzles/')
         else:
             return render(request,'auth/sign_up.html',{'form':form})
-    elif request.method == 'GET':
+    def get(self,request):
         if not request.user.is_authenticated:
             form = SignupForm()
             return render(request,'auth/sign_up.html',{'form':form})
@@ -87,13 +118,14 @@ def signup(request):
             return redirect('/puzzles/')
 
 
-def profile(request):
-    if request.method == 'GET':
+class profile_view(View):
+    def get(self,request):
         if request.user.is_authenticated:
             user = User.objects.get(id=request.user.id)
-            return render(request,'auth/profile.html',context={'form':ProfileChangeForm(user)})
+            mylist=Question.objects.filter(creator__id=request.user.id) if "my_puzzle" in request.GET else None
+            return render(request,'auth/profile.html',context={'form':ProfileChangeForm(user),'page_obj':mylist})
         return redirect('/sign_in')
-    elif request.method == 'POST':
+    def post(self,request):
         user = User.objects.get(id=request.user.id)
         form = ProfileChangeForm(user,request.POST)
         if form.is_valid():
@@ -104,24 +136,47 @@ def profile(request):
             return render(request,'auth/profile.html',{'form':form})
 
 
-def logout_view(request):
-    logout(request)
-    return redirect('/puzzles/')
+class logout_view(auth_views.LogoutView):
+    next_page='/puzzles/'
 
 
-def puzzle_submission_page(request,id,submission_id=None):
-    q=Question.objects.get(id=id)
-    if q.name=='new':
-        return HttpResponse('<h1>Page was not found</h1>')
-    context=vars(q)
-    context['creator']=q.creator.username
-    sub_list=Submission.objects.filter(question__id=id,private=False)
-    user_sub_list=Submission.objects.filter(creator__id=request.user.id) if request.user else None
-    if submission_id:
+class puzzle_submission_view(View):
+    @raise_404
+    def post(self,request,id):
+        submission_id = request.GET.get('submission')
         sub=Submission.objects.get(id=submission_id)
-        view_permission=sub.question.id==q.id and  ((request.user.is_superuser) or \
-            (q.name!="new" and((q.private==False) or (request.user.id==sub.creator.id))))
-        if view_permission:
-            return HttpResponse(render(request,'puzzle/display/submission.html',context={"section":'submission',"question":context,"submission":vars(sub)}))# add context
-    else:
-        return HttpResponse(render(request,'puzzle/display/submission.html',context={"section":'submission',"question":context}))# add context
+        edit_permission=((request.user.is_superuser) or \
+            ((request.user.id==sub.creator.id)))
+        if edit_permission:
+            if request.POST['command']=='publish':
+                sub.private=False
+                sub.save()
+            elif request.POST['command']=='delete':
+                sub.delete()
+        return redirect('/puzzles/'+str(id)+'/submission')
+
+    @raise_404
+    def get(self,request,id,list='user'):
+        q=Question.objects.get(id=id)
+        question_permission_check('view',q,request)
+        submission_id = request.GET.get('submission')
+        if q.name=='new':
+            raise Http404("Page does not exist")
+        context=vars(q)
+        context['creator']=q.creator.username
+        if list=='public':
+            sub_list=Submission.objects.filter(question__id=id,private=False)
+        else:
+            sub_list=Submission.objects.filter(creator__id=request.user.id) if request.user else None
+        if submission_id:
+            sub=Submission.objects.get(id=submission_id)
+            if sub.question.id!=q.id:
+                raise Http404()
+            view_permission=((request.user.is_superuser) or \
+                (q.name!="new" and((sub.private==False) or (request.user.id==sub.creator.id))))
+            if view_permission:
+                return HttpResponse(render(request,'puzzle/display/submission.html',context={"section":'submission',"question":context,'page_obj':sub_list,"submission":vars(sub),"edit_permission":question_permission_check('edit',q,request,check=False)}))# add context
+            else:
+                raise PermissionDenied()
+        else:
+            return HttpResponse(render(request,'puzzle/display/submission.html',context={"section":'submission',"question":context,'page_obj':sub_list,"edit_permission":question_permission_check('edit',q,request,check=False)}))# add context

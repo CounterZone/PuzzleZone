@@ -1,0 +1,8 @@
+FROM python:3.8.3-buster
+COPY ./Deployment/requirements_web.txt /
+RUN pip install -r requirements_web.txt
+RUN pip install daphne==2.3
+RUN mkdir /app
+COPY ./puzzle /app/puzzle
+COPY ./PuzzleZone /app/PuzzleZone
+WORKDIR /app

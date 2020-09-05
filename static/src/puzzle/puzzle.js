@@ -2,6 +2,7 @@ import Split from "split-grid";
 import ace from "ace-builds";
 import "bootstrap";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import '@fortawesome/fontawesome-free/css/all.css';
 import {ResizeSensor} from "css-element-queries";
 import "ace-builds/src-noconflict/mode-python";
 import WebSocketAsPromised from 'websocket-as-promised';
@@ -79,7 +80,7 @@ export function test_socket(){
   const testSocket = new WebSocketAsPromised(
     'ws://'
     + window.location.host
-    + '/puzzle/'
+    + '/ws/'
 );
 return testSocket;
 }

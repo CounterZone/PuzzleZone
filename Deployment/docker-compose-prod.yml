@@ -1,0 +1,79 @@
+version: '3.8'
+volumes:
+  user_test:
+    name: puzzlezone_user_test
+    driver: local
+    labels:
+      - docker.puzzle.user_test:user_test
+services:
+  db:
+    image: postgres
+    container_name: puzzlezone_postgres
+    volumes:
+      - ../Deployment/postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+  web:
+    build:
+      context: ..
+      dockerfile: Deployment/Dockerfile-web-prod
+    container_name: puzzlezone_web_prod
+    volumes:
+      - ..:/app
+    command: uwsgi --socket :8001 --wsgi-file /app/PuzzleZone/wsgi-prod.py
+    expose:
+      - 8001
+    depends_on:
+        - db
+        - rabbit
+  ws:
+    build:
+      context: ..
+      dockerfile: Deployment/Dockerfile-ws
+    container_name: puzzlezone_ws
+    volumes:
+      - ..:/app
+    command: daphne -b 0.0.0.0 -p 8001 PuzzleZone.asgi-prod:application
+    expose:
+      - 8001
+    depends_on:
+        - db
+        - rabbit
+  worker:
+    privileged: true
+    build:
+      context: ..
+      dockerfile: Deployment/Dockerfile-celery-worker
+    container_name: puzzlezone_worker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # expose the docker socket
+      - user_test:/puzzle/Docker_test/user:rw
+    depends_on:
+      - rabbit
+      - db
+  rabbit:
+    hostname: rabbit
+    image: rabbitmq:latest
+    container_name: puzzlezone_rabbit
+    environment:
+        - RABBITMQ_DEFAULT_USER=rabbit
+        - RABBITMQ_DEFAULT_PASS=rabbit
+    ports:
+        - "5672:5672"
+  nginx:
+    container_name: puzzlezone_nginx
+    build:
+      context: ..
+      dockerfile: Deployment/Dockerfile-nginx
+    depends_on:
+      - web
+      - ws
+    volumes:
+      - ../static:/home/app/static
+    ports:
+        - "80:80"

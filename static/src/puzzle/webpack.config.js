@@ -1,13 +1,17 @@
 const path = require('path');
 
 module.exports = {
-  entry:{'puzzle': './puzzle/puzzle.js',
-  'edit':'./puzzle/edit.js',
-  'display':'./puzzle/display.js',
-  'puzzle_list':'./puzzle/puzzle_list.js',
-  'submission':'./puzzle/submission.js',
-  'sign_in':'./puzzle/sign_in.js',
-  'profile':'./puzzle/profile.js'
+  context: path.resolve(__dirname),
+  entry:{'puzzle': './puzzle.js',
+  'edit':'./edit.js',
+  'display':'./display.js',
+  'puzzle_list':'./puzzle_list.js',
+  'submission':'./submission.js',
+  'sign_in':'./sign_in.js',
+  'profile':'./profile.js'
+  },
+  resolve: {
+    modules: ['node_modules']
   },
   output: {
     filename: '[name].min.js',
@@ -29,11 +33,27 @@ module.exports = {
 
 
   module:{
-    rules: [
-          {
-            test: /\.css$/,
-            use: ['style-loader', 'css-loader']
-          }
+    rules:[
+            {
+                test: /\.js$/,
+                use: {
+                    loader: 'babel-loader',
+                    options:{
+                        presets: ['@babel/preset-react']
+                    }
+                }
+            },
+            {
+                test: /\.(sass|scss|css)$/,
+                use: ['style-loader','css-loader','sass-loader']
+            },
+            {
+                test: /\.(svg|eot|woff|woff2|ttf)$/,
+                loader: 'file-loader',
+                options: {
+                publicPath: '/static/src/puzzle/dist'
+            }
+            }
         ]
   }
 };

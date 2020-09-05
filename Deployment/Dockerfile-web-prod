@@ -1,0 +1,10 @@
+FROM python:3.8.3-buster
+COPY ./Deployment/requirements_web.txt /
+RUN pip install -r requirements_web.txt
+RUN pip install uwsgi>=2.0
+RUN mkdir /app
+COPY ./puzzle /app/puzzle
+COPY ./PuzzleZone /app/PuzzleZone
+COPY ./templates /app/templates
+
+WORKDIR /app

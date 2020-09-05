@@ -107,10 +107,6 @@ function send_test(){
 $("#save_draft").on('click',()=>{submit(true)});
 
 
-$("#test_question").on('click',()=>{
-  // todo
-});
-
 
 $("#submit_question").on('click',()=>{
       submit(false);

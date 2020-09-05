@@ -24,7 +24,7 @@
 
     {% for question in page_obj %}
 
-    <a href="{{question.id}}" class="list-group-item list-group-item-action">{{ forloop.counter0|add:start_index }}.{{ question.name }}</a>
+    <a href="{{question.id}}" class="list-group-item list-group-item-action">{{ question.name }}</a>
 
     {% endfor %}
 

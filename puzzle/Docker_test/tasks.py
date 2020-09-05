@@ -119,41 +119,8 @@ def full_test(self,solution,question_id):
     except CompileError as e:
         self.update_state(state='TEST_FAIL',meta={'stdout':"",'message':e.message})
         return 'Error',0,0
-
-@app.task(bind=True,name='question_test',soft_time_limit=FULL_TIME_LIMIT)
-def question_test(self,question_id):
-    '''
-    test the question
-    solution is the solution field of question object
-    '''
-    test_count=0
-    pass_count=0
-    try:
-        q=docker_prepare(solution,question_id)
-        PASS_MESSAGE=SETTINGS['PASS_MESSAGE']
-        FAIL_MESSAGE=SETTINGS['FAIL_MESSAGE']
-        solution=json.loads(q.solution_code)
-        test_cases=io.StringIO(json.loads(q.test_cases))
-        for test_case in test_cases.readlines():
-            test_case=test_case.rstrip('\n')
-            if test_case[0]=='#': # ignore lines start with #
-                continue
-            test_args,test_result=test_case.split(':')
-            test_count+=1
-            result=docker_test(test_args,test_result)
-            if result['status']=='PASS':
-                self.update_state(state="TEST_PASS", meta={'stdout':result['stdout'],'message':PASS_MESSAGE.format(test_case_id=test_count,test_args=test_args,test_result=test_result,user_result=result['result'])})
-                pass_count+=1
-            else:
-                self.update_state(state='TEST_FAIL',meta={'stdout':result['stdout'],'message':FAIL_MESSAGE.format(test_case_id=test_count,test_args=test_args,test_result=test_result,user_result=result['result'])})
-        return 'Succeed.',test_count,pass_count
-    except SoftTimeLimitExceeded:
-        docker_clean_up()
-        return 'ExceedTimeLimit',test_count,pass_count
-    except CompileError as e:
-        self.update_state(state='TEST_FAIL',meta={'stdout':'','message':e.message})
-        return 'Error',0,0
-
+    except:
+        return 'Error',test_count,pass_count
 
 
 def docker_prepare(solution,question_id):

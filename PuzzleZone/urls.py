@@ -22,8 +22,8 @@ from puzzle import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('puzzles/',include('puzzle.urls')),
-    path('sign_in/', auth_views.LoginView.as_view(template_name='auth/sign_in.html',redirect_authenticated_user=True),name='login'),
-    path('sign_up/', views.signup,name='signup'),
-    path('profile/',views.profile),
-    path('logout/', views.logout_view,name='logout'),
+    path('sign_in/', views.signin_view.as_view(),name='login'),
+    path('sign_up/', views.signup_view.as_view(),name='signup'),
+    path('profile/',views.profile_view.as_view(),name='profile'),
+    path('logout/', views.logout_view.as_view(),name='logout'),
 ]
