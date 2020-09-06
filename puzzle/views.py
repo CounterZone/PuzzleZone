@@ -62,6 +62,7 @@ class puzzle_display_view(View):
                     p.audited=Question.DRAFT
                 else:
                     p.audited=Question.SUBMITTED
+                p.creator=request.user
                 p.save()
             else:
                 return HttpResponse('<h1>Invalid submission</h1>')
