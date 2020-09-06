@@ -15,7 +15,7 @@ var section=$('#q_attr').attr("sec");
 var in_preview=false;
 $('#description_editor').val(JSON.parse($('#description_editor').val()));
 var default_edit=$('#description_editor').val();
-
+$("#preview").hide();
 
 
 function save(){
