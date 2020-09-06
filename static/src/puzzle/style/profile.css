@@ -17,11 +17,14 @@ grid-row:1;
 padding:10px;
 padding-top:20px;
 display: flex;
+overflow:auto !important;
 }
 #app_right{
     position: relative;
 grid-column:3;
 grid-row:1;
+overflow:auto !important;
+
 padding:10px;
 }
 .gutter{

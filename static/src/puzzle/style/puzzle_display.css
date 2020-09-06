@@ -25,20 +25,18 @@ grid-row:1;
 grid-column:1;
 grid-row:2/5;
 padding:10px;
+overflow: auto;
 }
 #app_right_top{
 grid-column:3;
 grid-row:2;
 }
 
-.app_grid{
-  border: 1px #CCCCCC solid;
-}
 #app_right_bottom{
 grid-column:3;
 grid-row:4;
-overflow: auto;
 white-space: pre;
+overflow: auto;
 }
 #app_right_bottom>p{
   margin:0;
@@ -78,8 +76,8 @@ cursor: grab;
 }
 
 #description_editor,#preview{
-  resize: none;border: none;    outline: none;
-
+  resize: none;border: none;outline: none;
+  overflow: visible;
   height:100%;
   width:100%;
 }
