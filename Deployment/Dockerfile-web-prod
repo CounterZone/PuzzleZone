@@ -6,5 +6,5 @@ RUN mkdir /app
 COPY ./puzzle /app/puzzle
 COPY ./PuzzleZone /app/PuzzleZone
 COPY ./templates /app/templates
-
+COPY ./manage.py /app
 WORKDIR /app
