@@ -1,1 +1,1 @@
-SECRET_KEY='231der#$'
+SECRET_KEY='dsfasdf'

@@ -1,4 +1,4 @@
-echo "SECRET_KEY='${PUZZLE_KEY}'" > ../PuzzleZone/secret_key.py
+echo "SECRET_KEY='dsfasdf'" > ../PuzzleZone/secret_key.py
 
 docker volume create puzzlezone_user_test
 
