@@ -16,12 +16,12 @@
       <li class="nav-item ">
         <a class="nav-link" href="public">Published submission </a>
         </li>
-    </ul>
+    </div>
     </nav>
   {% for sub in page_obj %}
 
   <a href="?submission={{sub.id}}" class="list-group-item list-group-item-action {%if sub.id == submission.id %} active {% endif %} " >
-    {{ forloop.counter0|add:0 }}.{{ sub.name }} {{sub.result}}  {{sub.create_time}} -- by {{sub.creator}}{%if not sub.private %} <span class="fas fa-newspaper"> {% endif %}
+    {{ sub.name }} {{sub.result}}  {{sub.create_time}} -- by {{sub.creator}}{%if not sub.private %} <span class="fas fa-newspaper"> {% endif %}
   </a>
 
   {% endfor %}

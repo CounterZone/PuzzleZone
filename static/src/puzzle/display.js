@@ -57,7 +57,7 @@ ws.onMessage.addListener(msg => {
   else if (msg_json['command']=='display')display_log(msg_json['message']);
 else if (msg_json['command']=='fail_sample_test')display_log('You did not pass the test!');
 else if (msg_json['command']=='submission_redirect')
-window.location.href = "./submission?submission="+msg_json['message'];
+window.location.href = "./submission/user?submission="+msg_json['message'];
 
 
 });
