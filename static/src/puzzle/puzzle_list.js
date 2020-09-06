@@ -1,6 +1,7 @@
 import "bootstrap";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Split from "split-grid";
+import {render_md} from './puzzle.js'
 
 Split({
 columnGutters: [{
@@ -10,3 +11,4 @@ columnGutters: [{
 columnMinSize:200
 
 });
+$('#app_left').html(render_md($('#app_left').text()));

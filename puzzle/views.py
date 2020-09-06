@@ -93,6 +93,14 @@ class puzzle_list_view(ListView):
     template_name = 'puzzle/puzzle_list.html'
     context_object_name = 'puzzle_list'
     queryset=Question.objects.filter(audited=Question.ACCEPTED).exclude(name='new').values('name','id')
+    def get_context_data(self, **kwargs):
+        import os.path
+        context = super().get_context_data(**kwargs)
+        r=open(os.path.join(os.path.abspath(os.path.dirname(__file__)),'..','Readme.md'))
+        context['readme'] = str(r.read())
+        r.close()
+        return context
+
 
 class signin_view(auth_views.LoginView):
     template_name='auth/sign_in.html'
