@@ -10,7 +10,7 @@ services:
     image: postgres
     container_name: puzzlezone_postgres
     volumes:
-      - ../Deployment/postgres_data:/var/lib/postgresql/data
+      - ../../postgres_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
