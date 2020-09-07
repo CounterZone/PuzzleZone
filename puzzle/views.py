@@ -75,6 +75,7 @@ class puzzle_display_view(View):
             q=Question.objects.get(id=id)
             if q.name=='new':
                 raise Http404()
+        question_permission_check('view',q,request)
         if section in ["description","solution"] and id!="new":
                 context=vars(q)
                 context['creator']=q.creator.username
