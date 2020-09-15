@@ -4,6 +4,7 @@ import docker
 sys.path.insert(0,'/')
 from . import SetDjangoORM
 from puzzle.models import Question
+import tarfile
 
 from celery.exceptions import SoftTimeLimitExceeded
 
@@ -14,8 +15,9 @@ HOST_NAME=os.getenv('HOSTNAME')
 
 USER_PATH='/puzzle/Docker_test/user/'
 
-CONTAINER_NAME='user_test'
-VOLUME_NAME='puzzlezone_user_test'
+CONTAINER_NAME='puzzlezone_user_test_'+HOST_NAME
+HELPER_CONTAINER_NAME='puzzlezone_user_test_helper'+HOST_NAME
+VOLUME_NAME=CONTAINER_NAME+'_vol'
 
 # settings
 MEM_LIMIT='1g'
@@ -30,6 +32,8 @@ SETTINGS={
 
 
 client=docker.from_env()
+client.volumes.create(name=VOLUME_NAME, driver='local')
+
 try:
     container=client.containers.get(CONTAINER_NAME)
 except docker.errors.NotFound:
@@ -41,6 +45,16 @@ except docker.errors.NotFound:
     read_only=True,
     working_dir='/user',
     name=CONTAINER_NAME,
+    network_disabled=True
+    )
+try:
+    helper=client.containers.get(HELPER_CONTAINER_NAME)
+except docker.errors.NotFound:
+    image=client.images.get('test_image')
+    helper=client.containers.create(image,detach=True,
+    volumes={VOLUME_NAME:{'bind':'/user','mode':'rw'}},
+    working_dir='/user',
+    name=HELPER_CONTAINER_NAME,
     network_disabled=True
     )
 container.start()
@@ -143,6 +157,13 @@ def docker_prepare(solution,question_id):
     test_file.write(json.loads(q.test_code))
     sol_file.close()
     test_file.close()
+    tar = tarfile.open(os.path.join(USER_PATH,'temp.tar'),'w')
+    tar.add(os.path.join(USER_PATH,'solution.py'),arcname='solution.py')
+    tar.add(os.path.join(USER_PATH,'test.py'),arcname='test.py')
+    tar.add(os.path.join(USER_PATH,'run_test.py'),arcname='run_test.py')
+    tar.close()
+    data = open(os.path.join(USER_PATH,'temp.tar'), 'rb').read()
+    helper.put_archive('/user', data)
     prepare_output=container.exec_run('python /user/run_test.py --get_settings')
     if prepare_output.exit_code==0:
         setting=json.loads(prepare_output.output)

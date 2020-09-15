@@ -1,16 +1,11 @@
 version: '3.8'
-volumes:
-  user_test:
-    name: puzzlezone_user_test
-    driver: local
-    labels:
-      - docker.puzzle.user_test:user_test
+
 services:
   db:
     image: postgres
     container_name: puzzlezone_postgres
     volumes:
-      - ../Deployment/postgres_data:/var/lib/postgresql/data
+      - ../../postgres_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
@@ -35,11 +30,9 @@ services:
     build:
       context: ..
       dockerfile: Deployment/Dockerfile-celery-worker
-    container_name: puzzlezone_worker
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       # expose the docker socket
-      - user_test:/puzzle/Docker_test/user:rw
     depends_on:
       - rabbit
       - db
