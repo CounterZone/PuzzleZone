@@ -16,8 +16,6 @@ var in_preview=false;
 $('#description_editor').val(JSON.parse($('#description_editor').val()));
 var default_edit=$('#description_editor').val();
 $("#preview").hide();
-$('#app_left').css('overflow','hidden');
-
 
 function save(){
   if(typeof(Storage)==undefined)
