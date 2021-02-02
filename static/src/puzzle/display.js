@@ -5,7 +5,7 @@ window.$ = window.jQuery = jQuery;
 
 
 load_split();
-$('#app_left').html(render_md(JSON.parse($('#app_left').text())));
+$('#description').html(render_md(JSON.parse($('#description').text())));
 
 var code_editor=load_code_editor();
 var default_code=code_editor.getValue();

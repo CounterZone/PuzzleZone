@@ -90,9 +90,9 @@ code {
   font-size: 20px;
 }
 
-#description_editor,#preview{
+#description_editor,#preview,#description{
   resize: none;border: none;outline: none;
-  overflow: scroll;
+  overflow: auto;
   height:100%;
   width:100%;
 margin:0;
