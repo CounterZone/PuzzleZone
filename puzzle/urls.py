@@ -24,7 +24,7 @@ urlpatterns = [
     path('',views.puzzle_list_view.as_view(),name='puzzle_list'),
     path('<int:id>/',views.puzzle_display_view.as_view(),name="puzzle_display"),
     path('<int:id>/submission',views.puzzle_submission_view.as_view(),name='submission'),
-    path('<int:id>/submission/<list>',views.puzzle_submission_view.as_view(),name='submission'),
+    path('<int:id>/submission/<submission_list>',views.puzzle_submission_view.as_view(),name='submission'),
     path('<id>/<section>',views.puzzle_display_view.as_view()),
 
 ]

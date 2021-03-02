@@ -152,7 +152,7 @@ class logout_view(auth_views.LogoutView):
 
 class puzzle_submission_view(View):
     @raise_404
-    def post(self,request,id):
+    def post(self,request,id,submission_list):
         submission_id = request.GET.get('submission')
         sub=Submission.objects.get(id=submission_id)
         edit_permission=((request.user.is_superuser) or \
@@ -163,10 +163,10 @@ class puzzle_submission_view(View):
                 sub.save()
             elif request.POST['command']=='delete':
                 sub.delete()
-        return redirect('/puzzles/'+str(id)+'/submission')
+        return redirect('/puzzles/'+str(id)+'/submission/'+submission_list)
 
     @raise_404
-    def get(self,request,id,list='user'):
+    def get(self,request,id,submission_list='user'):
         q=Question.objects.get(id=id)
         question_permission_check('view',q,request)
         submission_id = request.GET.get('submission')
@@ -174,9 +174,9 @@ class puzzle_submission_view(View):
             raise Http404("Page does not exist")
         context=vars(q)
         context['creator']=q.creator.username
-        if list=='public':
+        if submission_list=='public':
             sub_list=Submission.objects.filter(question__id=id,private=False)
-        else:
+        elif submission_list=='user':
             sub_list=Submission.objects.filter(creator__id=request.user.id) if request.user else None
         if submission_id:
             sub=Submission.objects.get(id=submission_id)
